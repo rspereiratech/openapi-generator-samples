@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>io.github.rspereiratech</groupId>
+        <artifactId>openapi-generator-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>openapi-generator-samples</artifactId>
+
+    <name>OpenAPI Generator - Samples</name>
+    <description>
+        Sample Spring MVC application used to validate the openapi-generator-maven-plugin.
+        The openapi.yaml is generated from compiled classes during the process-classes phase.
+    </description>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.soabase.record-builder</groupId>
+            <artifactId>record-builder-core</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.github.rspereiratech</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>1.0.0-SNAPSHOT</version>
+                <executions>
+                    <execution>
+                        <id>generate-openapi</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <basePackages>
+                        <basePackage>io.github.rspereiratech.openapi.generator.samples</basePackage>
+                    </basePackages>
+                    <outputFile>docs/swagger/openapi.yaml</outputFile>
+                    <contextPath>vcc-superx-api</contextPath>
+                    <title>Sample API</title>
+                    <description>Demo REST API generated offline from Spring MVC annotations</description>
+                    <version>1.0.0</version>
+                    <servers>
+                        <server>
+                            <url>https://api.example.com</url>
+                            <description>Production</description>
+                        </server>
+                        <server>
+                            <url>https://staging.example.com</url>
+                            <description>Staging</description>
+                        </server>
+                        <server>
+                            <url>http://localhost:8080</url>
+                            <description>Local development</description>
+                        </server>
+                    </servers>
+                    <contactName>API Team</contactName>
+                    <contactEmail>api@example.com</contactEmail>
+                    <licenseName>Apache 2.0</licenseName>
+                    <licenseUrl>https://www.apache.org/licenses/LICENSE-2.0</licenseUrl>
+                    <controllerAnnotations>
+                        <controllerAnnotation>io.github.rspereiratech.openapi.generator.samples.annotation.CustomRestController</controllerAnnotation>
+                    </controllerAnnotations>
+                    <securitySchemes>
+                        <securityScheme>
+                            <name>bearerAuth</name>
+                            <type>http</type>
+                            <scheme>bearer</scheme>
+                            <bearerFormat>JWT</bearerFormat>
+                            <description>JWT token obtained from the auth service (Authorization: Bearer &lt;token&gt;)</description>
+                        </securityScheme>
+                    </securitySchemes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
