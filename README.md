@@ -2,8 +2,9 @@
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Java 21](https://img.shields.io/badge/Java-21-blue?logo=openjdk)](https://openjdk.org/projects/jdk/21/)
+[![Spring](https://img.shields.io/badge/Spring-6DB33F?logo=spring&logoColor=white)](https://spring.io)
 [![OpenAPI 3.0](https://img.shields.io/badge/OpenAPI-3.0-green?logo=openapiinitiative)](docs/swagger/openapi.yaml)
-[![Swagger UI](https://img.shields.io/badge/Swagger%20UI-live-85EA2D?logo=swagger)](https://rspereiratech.github.io/openapi-generator-samples/)
+![REST API](https://img.shields.io/badge/REST-API-blue)
 
 Sample Spring MVC application used to validate and demonstrate the capabilities of the [`openapi-generator-maven-plugin`](https://github.com/rspereiratech/openapi-generator-maven-plugin).
 
