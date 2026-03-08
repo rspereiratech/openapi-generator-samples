@@ -56,7 +56,7 @@ The plugin generates an OpenAPI 3.0 document **at build time**, directly from co
 | Maven | 3.9+ |
 | `openapi-generator-parent` | latest (must be installed locally) |
 
-> The parent POM manages all dependency versions. Install it before building this module.
+> The parent POM manages all dependency versions. Install it before building this project.
 
 ---
 
@@ -243,7 +243,7 @@ The plugin is configured in `pom.xml`. The key parameters used in this sample ar
 # Install the parent POM and plugin first (from the parent repository)
 mvn install -f ../openapi-generator-parent/pom.xml
 
-# Build this module and regenerate openapi.yaml
+# Build this project and regenerate openapi.yaml
 mvn process-classes
 ```
 
