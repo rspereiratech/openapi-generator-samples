@@ -1,5 +1,10 @@
 # openapi-generator-samples
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Java 21](https://img.shields.io/badge/Java-21-blue?logo=openjdk)](https://openjdk.org/projects/jdk/21/)
+[![OpenAPI 3.0](https://img.shields.io/badge/OpenAPI-3.0-green?logo=openapiinitiative)](docs/swagger/openapi.yaml)
+[![Swagger UI](https://img.shields.io/badge/Swagger%20UI-live-85EA2D?logo=swagger)](https://rspereiratech.github.io/openapi-generator-samples/)
+
 Sample Spring MVC application used to validate and demonstrate the capabilities of the [`openapi-generator-maven-plugin`](https://github.com/rspereiratech/openapi-generator-maven-plugin).
 
 The project exercises a wide range of real-world annotation patterns so that every feature of the plugin has a concrete, runnable test case to be verified against.
