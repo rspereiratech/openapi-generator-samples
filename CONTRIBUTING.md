@@ -124,7 +124,7 @@ Before opening a PR, verify that:
 
 ## Submitting a Pull Request
 
-1. Fork the repository and create a branch from `main`.
+1. Fork the repository and create a branch from `master`.
 2. Implement your scenario following the steps above.
 3. Regenerate and commit `docs/swagger/openapi.yaml`.
 4. Open a pull request with a clear description of what plugin behaviour the scenario covers.
