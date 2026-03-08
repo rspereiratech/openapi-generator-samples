@@ -31,10 +31,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
-        <dependency>
-            <groupId>io.soabase.record-builder</groupId>
-            <artifactId>record-builder-core</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
@@ -56,7 +52,7 @@
                         <basePackage>io.github.rspereiratech.openapi.generator.samples</basePackage>
                     </basePackages>
                     <outputFile>docs/swagger/openapi.yaml</outputFile>
-                    <contextPath>vcc-superx-api</contextPath>
+                    <contextPath>sample-api</contextPath>
                     <title>Sample API</title>
                     <description>Demo REST API generated offline from Spring MVC annotations</description>
                     <version>1.0.0</version>
@@ -94,5 +90,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

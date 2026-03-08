@@ -1,0 +1,1177 @@
+openapi: 3.0.3
+info:
+  title: Sample API
+  description: Demo REST API generated offline from Spring MVC annotations
+  contact:
+    name: API Team
+    email: api@example.com
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+  version: 1.0.0
+servers:
+- url: https://api.example.com/sample-api/
+  description: Production
+- url: https://staging.example.com/sample-api/
+  description: Staging
+- url: http://localhost:8080/sample-api/
+  description: Local development
+security:
+- bearerAuth: []
+tags:
+- name: orders
+  description: Order management
+- name: notifications
+  description: Notification delivery operations
+- name: Generic REST API
+  description: Generic CRUD operations for domain entities
+- name: Agents
+  description: Agent management operations
+- name: users
+  description: User management operations
+- name: products
+  description: Product catalogue operations
+paths:
+  /api/v1/orders/{id}:
+    get:
+      tags:
+      - orders
+      summary: Get order by ID
+      operationId: getOrder
+      parameters:
+      - name: id
+        in: path
+        description: Order ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Order found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDto'
+        "404":
+          description: Order not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDto'
+    delete:
+      tags:
+      - orders
+      summary: Cancel an order
+      operationId: cancelOrder
+      parameters:
+      - name: id
+        in: path
+        description: ID of the order to cancel
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Order cancelled
+        "404":
+          description: Order not found
+  /api/v1/orders:
+    get:
+      tags:
+      - orders
+      summary: List all orders
+      operationId: listOrders
+      responses:
+        "200":
+          description: Orders retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderDto'
+    post:
+      tags:
+      - orders
+      summary: Place a new order
+      description: Creates a new order for the given customer.
+      operationId: createOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderDto'
+        required: true
+      responses:
+        "201":
+          description: Order placed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDto'
+  /api/v1/notifications/providers:
+    get:
+      tags:
+      - notifications
+      summary: List notification providers
+      description: Returns all configured delivery providers and their current availability.
+      operationId: listProviders
+      responses:
+        "200":
+          description: Provider list returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificationProviderDto'
+  /api/v1/notifications/health:
+    get:
+      tags:
+      - notifications
+      summary: Health check
+      description: Returns a simple status string indicating whether the notification
+        subsystem is operational.
+      operationId: healthCheck
+      responses:
+        "200":
+          description: Subsystem is healthy
+          content:
+            application/json:
+              schema:
+                type: string
+  /api/v1/notifications/pending:
+    get:
+      tags:
+      - notifications
+      summary: List pending notifications
+      description: Returns all notifications that are queued but not yet delivered.
+      operationId: listPending
+      responses:
+        "200":
+          description: Pending notifications returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/NotificationDto'
+  /api/v1/notifications:
+    post:
+      tags:
+      - notifications
+      summary: Send notification
+      description: Dispatches a notification to the given recipient via the requested
+        channel.
+      operationId: sendNotification
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendNotificationRequest'
+        required: true
+      responses:
+        "202":
+          description: Notification accepted for delivery
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationDto'
+        "400":
+          description: Invalid request payload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationDto'
+        "503":
+          description: No provider available for the requested channel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationDto'
+  /api/v1/notifications/{id}:
+    get:
+      tags:
+      - notifications
+      summary: Get notification
+      description: Returns the current status and metadata of a single notification.
+      operationId: getNotification
+      parameters:
+      - name: id
+        in: path
+        description: Notification ID
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: "1"
+      responses:
+        "200":
+          description: Notification found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationDto'
+        "404":
+          description: Notification not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotificationDto'
+    delete:
+      tags:
+      - notifications
+      summary: Cancel notification
+      description: Cancels a pending notification. Has no effect if already delivered.
+      operationId: cancelNotification
+      parameters:
+      - name: id
+        in: path
+        description: Notification ID to cancel
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: "1"
+      responses:
+        "204":
+          description: Notification cancelled
+        "404":
+          description: Notification not found
+        "409":
+          description: Notification already delivered or failed
+  /api/v1/agents/{id}:
+    get:
+      tags:
+      - Generic REST API
+      - Agents
+      summary: Get entity by ID
+      description: Returns the entity with the given ID
+      operationId: getById
+      parameters:
+      - name: id
+        in: path
+        description: Logical ID of the entity
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Entity found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "404":
+          description: Entity not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+    put:
+      tags:
+      - Generic REST API
+      - Agents
+      summary: Update existing entity
+      description: Replaces the data of the entity with the given ID
+      operationId: update
+      parameters:
+      - name: id
+        in: path
+        description: Logical ID of the entity
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentDto'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+    delete:
+      tags:
+      - Generic REST API
+      - Agents
+      summary: Delete entity by ID
+      description: Deletes the entity with the specified ID
+      operationId: delete
+      parameters:
+      - name: id
+        in: path
+        description: Logical ID of the entity
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Entity deleted successfully
+        "404":
+          description: Entity not found
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+    patch:
+      tags:
+      - Generic REST API
+      - Agents
+      summary: Partially update an existing entity
+      description: Applies partial modifications to the entity identified by the given
+        ID
+      operationId: patch
+      parameters:
+      - name: id
+        in: path
+        description: Logical ID of the entity
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentDto'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+  /api/v1/agents:
+    get:
+      tags:
+      - Generic REST API
+      - Agents
+      summary: Get all entities
+      description: "Returns a paginated list of entities, with optional filtering\
+        \ and sorting"
+      operationId: getAll
+      parameters:
+      - name: page
+        in: query
+        description: Page number (0-based)
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: "0"
+      - name: size
+        in: query
+        description: Page size
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: "20"
+      responses:
+        "200":
+          description: Entities fetched successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AgentDto'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AgentDto'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AgentDto'
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AgentDto'
+    post:
+      tags:
+      - Generic REST API
+      - Agents
+      summary: Create new entity
+      description: Creates a new instance of the entity
+      operationId: create
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentDto'
+        required: true
+      responses:
+        "201":
+          description: Entity created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "400":
+          description: Invalid request data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+  /api/v1/agents/{id}/exists:
+    get:
+      tags:
+      - Generic REST API
+      - Agents
+      summary: Check if entity exists
+      description: Verifies whether an entity with the given ID exists
+      operationId: exists
+      parameters:
+      - name: id
+        in: path
+        description: Logical ID of the entity
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Entity exists
+          content:
+            application/json:
+              schema:
+                type: boolean
+        "404":
+          description: Entity not found
+          content:
+            application/json:
+              schema:
+                type: boolean
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: boolean
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: boolean
+  /api/v1/agents/{id}/group:
+    get:
+      tags:
+      - Generic REST API
+      - Agents
+      summary: Get Agent Group by Agent ID
+      description: Returns the agent group associated with the given agent ID
+      operationId: getAgentGroupByAgentId
+      parameters:
+      - name: id
+        in: path
+        description: Logical agent ID
+        required: true
+        schema:
+          type: string
+        example: agent-123
+      responses:
+        "200":
+          description: Agent group found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentGroupDto'
+        "404":
+          description: Agent or group not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentGroupDto'
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentGroupDto'
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentGroupDto'
+  /api/v1/users:
+    get:
+      tags:
+      - users
+      summary: List users
+      description: "Returns a paginated list of users, optionally filtered by name\
+        \ or role."
+      operationId: listUsers
+      parameters:
+      - name: name
+        in: query
+        description: Filter by name fragment (case-insensitive)
+        required: false
+        schema:
+          type: string
+        example: Maria
+      - name: role
+        in: query
+        description: Filter by role
+        required: false
+        schema:
+          type: string
+        example: ADMIN
+      - name: page
+        in: query
+        description: Page number (0-based)
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: "0"
+      - name: size
+        in: query
+        description: Page size (max 100)
+        required: true
+        schema:
+          type: integer
+          format: int32
+        example: "20"
+      responses:
+        "200":
+          description: Page of users returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedResponseUserDto'
+        "400":
+          description: Invalid query parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedResponseUserDto'
+    post:
+      tags:
+      - users
+      summary: Create user
+      description: Registers a new user account. The email must be unique.
+      operationId: createUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+        required: true
+      responses:
+        "201":
+          description: User created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        "400":
+          description: Validation error in request body
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        "409":
+          description: Email already registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+  /api/v1/users/{id}:
+    get:
+      tags:
+      - users
+      summary: Get user by ID
+      description: Returns the full profile of a single user.
+      operationId: getUserById
+      parameters:
+      - name: id
+        in: path
+        description: Unique identifier of the user
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: "42"
+      responses:
+        "200":
+          description: User found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+    put:
+      tags:
+      - users
+      summary: Update user
+      description: Replaces all mutable fields of an existing user.
+      operationId: updateUser
+      parameters:
+      - name: id
+        in: path
+        description: Unique identifier of the user to update
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: "42"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserDto'
+    delete:
+      tags:
+      - users
+      summary: Delete user
+      description: Permanently removes a user account.
+      operationId: deleteUser
+      parameters:
+      - name: id
+        in: path
+        description: Unique identifier of the user to delete
+        required: true
+        schema:
+          type: integer
+          format: int64
+        example: "42"
+      responses:
+        "204":
+          description: User deleted successfully
+        "404":
+          description: User not found
+  /api/v1/users/search:
+    get:
+      tags:
+      - users
+      summary: Search users
+      description: Full-text search across name and email fields.
+      operationId: searchUsers
+      parameters:
+      - name: q
+        in: query
+        description: Search query string
+        required: true
+        schema:
+          type: string
+        example: silva
+      - name: page
+        in: query
+        description: Page number (0-based)
+        required: true
+        schema:
+          type: integer
+          format: int32
+      - name: size
+        in: query
+        description: Page size
+        required: true
+        schema:
+          type: integer
+          format: int32
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedResponseUserDto'
+  /api/v1/products/{id}:
+    get:
+      tags:
+      - products
+      summary: Get by ID
+      description: Returns a single resource identified by its primary key.
+      operationId: getById_1
+      parameters:
+      - name: id
+        in: path
+        description: Primary key of the resource
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: Resource found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDto'
+        "404":
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDto'
+    delete:
+      tags:
+      - products
+      summary: Delete by ID
+      description: Permanently removes a resource.
+      operationId: deleteById
+      parameters:
+      - name: id
+        in: path
+        description: Primary key of the resource to delete
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "204":
+          description: Resource deleted
+        "404":
+          description: Resource not found
+  /api/v1/products:
+    get:
+      tags:
+      - products
+      summary: List all
+      description: Returns every resource (unfiltered).
+      operationId: listAll
+      responses:
+        "200":
+          description: Full list returned
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDto'
+    post:
+      tags:
+      - products
+      summary: Create product
+      description: Adds a new product to the catalogue.
+      operationId: createProduct
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductDto'
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProductDto'
+  /api/v1/products/category/{category}:
+    get:
+      tags:
+      - products
+      summary: List products by category
+      description: Returns all products belonging to the given category.
+      operationId: listByCategory
+      parameters:
+      - name: category
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProductDto'
+components:
+  schemas:
+    OrderDto:
+      required:
+      - customerId
+      - total
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier
+          format: int64
+          readOnly: true
+          example: 1
+        customerId:
+          type: integer
+          description: ID of the customer who placed the order
+          format: int64
+          example: 42
+        status:
+          type: string
+          description: Current order status
+          example: PENDING
+          enum:
+          - PENDING
+          - CONFIRMED
+          - SHIPPED
+          - DELIVERED
+          - CANCELLED
+        total:
+          type: number
+          description: Total order amount in EUR
+          example: 149.99
+        createdAt:
+          type: string
+          description: Timestamp when the order was placed
+          format: date-time
+          readOnly: true
+      description: Order data transfer object
+    NotificationProviderDto:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: Provider name
+          example: sendgrid
+        type:
+          type: string
+          description: Channel type handled by this provider
+          example: EMAIL
+          enum:
+          - EMAIL
+          - SMS
+          - PUSH
+        available:
+          type: boolean
+          description: Whether the provider is currently reachable
+          example: true
+      description: Notification provider descriptor
+    NotificationDto:
+      required:
+      - recipient
+      - type
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier
+          format: int64
+          readOnly: true
+          example: 1
+        type:
+          type: string
+          description: Delivery channel
+          example: EMAIL
+          enum:
+          - EMAIL
+          - SMS
+          - PUSH
+        recipient:
+          type: string
+          description: "Recipient address (email, phone number, or device token)"
+          example: user@example.com
+        subject:
+          type: string
+          description: Message subject or title
+          example: Your order has shipped
+        status:
+          type: string
+          description: Current delivery status
+          example: SENT
+          enum:
+          - PENDING
+          - SENT
+          - FAILED
+          - CANCELLED
+        createdAt:
+          type: string
+          description: When the notification was created
+          format: date-time
+          readOnly: true
+        sentAt:
+          type: string
+          description: When the notification was successfully delivered; null if not
+            yet sent
+          format: date-time
+          readOnly: true
+      description: Notification data transfer object
+    SendNotificationRequest:
+      required:
+      - body
+      - recipient
+      - subject
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: Delivery channel
+          example: EMAIL
+          enum:
+          - EMAIL
+          - SMS
+          - PUSH
+        recipient:
+          type: string
+          description: "Recipient address (email, phone number, or device token)"
+          example: user@example.com
+        subject:
+          type: string
+          description: Message subject or title
+          example: Your order has shipped
+        body:
+          type: string
+          description: Full message body
+          example: "Your order #42 is on its way!"
+        priority:
+          type: string
+          description: Delivery priority
+          example: NORMAL
+          default: NORMAL
+          enum:
+          - LOW
+          - NORMAL
+          - HIGH
+      description: Payload for dispatching a notification
+    AgentDto:
+      required:
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the agent
+          readOnly: true
+          example: agent-123
+        name:
+          type: string
+          description: Display name of the agent
+          example: Alice Smith
+        ssoId:
+          type: string
+          description: SSO identifier
+          example: alice.smith@8x8.com
+        ldapId:
+          type: string
+          description: LDAP identifier
+          example: "cn=alice,ou=agents,dc=8x8,dc=com"
+      description: Agent data transfer object
+    AgentGroupDto:
+      required:
+      - name
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the agent group
+          readOnly: true
+          example: group-001
+        name:
+          type: string
+          description: Display name of the agent group
+          example: Tier-1 Support
+      description: Agent group data transfer object
+    PagedResponseUserDto:
+      type: object
+      properties:
+        content:
+          type: array
+          description: Items in the current page
+          items:
+            $ref: '#/components/schemas/UserDto'
+        page:
+          type: integer
+          description: Current page number (0-based)
+          format: int32
+          example: 0
+        size:
+          type: integer
+          description: Number of items per page
+          format: int32
+          example: 20
+        totalElements:
+          type: integer
+          description: Total number of items across all pages
+          format: int64
+          example: 150
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int32
+          example: 8
+        last:
+          type: boolean
+          description: Whether this is the last page
+          example: false
+      description: Paginated response wrapper
+    UserDto:
+      required:
+      - email
+      - name
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier of the user
+          format: int64
+          readOnly: true
+          example: 42
+        name:
+          type: string
+          description: Full name of the user
+          example: Maria Silva
+        email:
+          type: string
+          description: Unique email address
+          example: maria@example.com
+        role:
+          type: string
+          description: Role assigned to the user
+          example: ADMIN
+          enum:
+          - USER
+          - ADMIN
+          - MANAGER
+        active:
+          type: boolean
+          description: Whether the account is active
+          example: true
+        createdAt:
+          type: string
+          description: Timestamp when the account was created
+          format: date-time
+          readOnly: true
+        updatedAt:
+          type: string
+          description: Timestamp of the last modification
+          format: date-time
+          readOnly: true
+      description: User data transfer object
+    CreateUserRequest:
+      required:
+      - email
+      - name
+      - password
+      type: object
+      properties:
+        name:
+          type: string
+          description: Full name of the user
+          example: João Costa
+        email:
+          type: string
+          description: Unique email address
+          example: joao@example.com
+        password:
+          type: string
+          description: Plain-text password (will be hashed server-side)
+          example: s3cr3t!
+        role:
+          type: string
+          description: Role to assign to the user
+          example: USER
+          default: USER
+          enum:
+          - USER
+          - ADMIN
+          - MANAGER
+      description: Payload for creating or updating a user
+    ProductDto:
+      required:
+      - name
+      - price
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Unique identifier
+          format: int64
+          readOnly: true
+          example: 1
+        name:
+          type: string
+          description: Product name
+          example: Wireless Keyboard
+        description:
+          type: string
+          description: Detailed description
+          example: Compact bluetooth keyboard
+        price:
+          type: number
+          description: Unit price in EUR
+          example: 49.99
+        category:
+          type: string
+          description: Product category
+          example: ELECTRONICS
+          enum:
+          - ELECTRONICS
+          - CLOTHING
+          - FOOD
+          - BOOKS
+        stock:
+          type: integer
+          description: Available stock quantity
+          format: int32
+          example: 150
+      description: Product data transfer object
+  securitySchemes:
+    bearerAuth:
+      type: http
+      description: "JWT token obtained from the auth service (Authorization: Bearer\
+        \ <token>)"
+      scheme: bearer
+      bearerFormat: JWT
