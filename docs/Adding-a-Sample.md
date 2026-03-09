@@ -13,8 +13,8 @@ Before writing code, identify **what plugin capability** your scenario exercises
 - [ ] Create the API interface or abstract class (if needed)
 - [ ] Create the controller
 - [ ] Regenerate `openapi.yaml` and verify the output
-- [ ] Document the scenario in `wiki/Scenarios.md`
-- [ ] Document any edge case in `wiki/Edge-Cases.md` (if applicable)
+- [ ] Document the scenario in `docs/Scenarios.md`
+- [ ] Document any edge case in `docs/Edge-Cases.md` (if applicable)
 
 ---
 
@@ -112,7 +112,7 @@ Commit both the source changes and the updated `openapi.yaml`.
 
 ## 6. Document the scenario
 
-Add a new section to `wiki/Scenarios.md` following the existing format:
+Add a new section to `docs/Scenarios.md` following the existing format:
 
 ```markdown
 ## N. Your Scenario Name
@@ -130,4 +130,4 @@ Add a new section to `wiki/Scenarios.md` following the existing format:
 ...
 ```
 
-If the scenario covers a tricky annotation pattern, also add an entry to `wiki/Edge-Cases.md`.
+If the scenario covers a tricky annotation pattern, also add an entry to `docs/Edge-Cases.md`.

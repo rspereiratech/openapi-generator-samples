@@ -230,7 +230,7 @@ The plugin is configured in `pom.xml`. The key parameters used in this sample ar
 | `outputFile` | Path where the YAML is written | `docs/swagger/openapi.yaml` |
 | `contextPath` | Servlet context path prepended to all server URLs | `sample-api` |
 | `title` | API title in the `info` block | `Sample API` |
-| `version` | API version | `1.0.0` |
+| `version` | API version | `1.1.0-SNAPSHOT` |
 | `servers` | List of server environments | Production, Staging, Local |
 | `controllerAnnotations` | Additional annotations treated as controller markers | `@CustomRestController` |
 | `securitySchemes` | Security schemes added to the `components` block | `bearerAuth` (HTTP Bearer JWT) |
