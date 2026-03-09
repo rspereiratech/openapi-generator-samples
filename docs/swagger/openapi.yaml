@@ -32,40 +32,6 @@ tags:
 - name: products
   description: Product catalogue operations
 paths:
-  /api/v1/orders:
-    get:
-      tags:
-      - orders
-      summary: List all orders
-      operationId: listOrders
-      responses:
-        "200":
-          description: Orders retrieved successfully
-          content:
-            '*/*':
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/OrderDto'
-    post:
-      tags:
-      - orders
-      summary: Place a new order
-      description: Creates a new order for the given customer.
-      operationId: createOrder
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/OrderDto'
-        required: true
-      responses:
-        "201":
-          description: Order placed successfully
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/OrderDto'
   /api/v1/orders/{id}:
     get:
       tags:
@@ -111,6 +77,40 @@ paths:
           description: Order cancelled
         "404":
           description: Order not found
+  /api/v1/orders:
+    get:
+      tags:
+      - orders
+      summary: List all orders
+      operationId: listOrders
+      responses:
+        "200":
+          description: Orders retrieved successfully
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/OrderDto'
+    post:
+      tags:
+      - orders
+      summary: Place a new order
+      description: Creates a new order for the given customer.
+      operationId: createOrder
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderDto'
+        required: true
+      responses:
+        "201":
+          description: Order placed successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/OrderDto'
   /api/v1/notifications:
     post:
       tags:
@@ -242,6 +242,124 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/NotificationDto'
+  /api/v1/agents/{id}:
+    get:
+      tags:
+      - Generic REST API
+      - Agents
+      summary: Get entity by ID
+      description: Returns the entity with the given ID
+      operationId: getById
+      parameters:
+      - name: id
+        in: path
+        description: Logical ID of the entity
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: Entity found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "404":
+          description: Entity not found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+    put:
+      tags:
+      - Generic REST API
+      - Agents
+      summary: Update existing entity
+      description: Replaces the data of the entity with the given ID
+      operationId: update
+      parameters:
+      - name: id
+        in: path
+        description: Logical ID of the entity
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentDto'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+    delete:
+      tags:
+      - Generic REST API
+      - Agents
+      summary: Delete entity by ID
+      description: Deletes the entity with the specified ID
+      operationId: delete
+      parameters:
+      - name: id
+        in: path
+        description: Logical ID of the entity
+        required: true
+        schema:
+          type: string
+      responses:
+        "204":
+          description: Entity deleted successfully
+        "404":
+          description: Entity not found
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+    patch:
+      tags:
+      - Generic REST API
+      - Agents
+      summary: Partially update an existing entity
+      description: Applies partial modifications to the entity identified by the given
+        ID
+      operationId: patch
+      parameters:
+      - name: id
+        in: path
+        description: Logical ID of the entity
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AgentDto'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
   /api/v1/agents:
     get:
       tags:
@@ -379,124 +497,6 @@ paths:
             '*/*':
               schema:
                 type: boolean
-  /api/v1/agents/{id}:
-    get:
-      tags:
-      - Generic REST API
-      - Agents
-      summary: Get entity by ID
-      description: Returns the entity with the given ID
-      operationId: getById
-      parameters:
-      - name: id
-        in: path
-        description: Logical ID of the entity
-        required: true
-        schema:
-          type: string
-      responses:
-        "200":
-          description: Entity found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/AgentDto'
-        "404":
-          description: Entity not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/AgentDto'
-        "401":
-          description: Unauthorized
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/AgentDto'
-        "403":
-          description: Forbidden
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/AgentDto'
-    put:
-      tags:
-      - Generic REST API
-      - Agents
-      summary: Update existing entity
-      description: Replaces the data of the entity with the given ID
-      operationId: update
-      parameters:
-      - name: id
-        in: path
-        description: Logical ID of the entity
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AgentDto'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/AgentDto'
-    delete:
-      tags:
-      - Generic REST API
-      - Agents
-      summary: Delete entity by ID
-      description: Deletes the entity with the specified ID
-      operationId: delete
-      parameters:
-      - name: id
-        in: path
-        description: Logical ID of the entity
-        required: true
-        schema:
-          type: string
-      responses:
-        "204":
-          description: Entity deleted successfully
-        "404":
-          description: Entity not found
-        "401":
-          description: Unauthorized
-        "403":
-          description: Forbidden
-    patch:
-      tags:
-      - Generic REST API
-      - Agents
-      summary: Partially update an existing entity
-      description: Applies partial modifications to the entity identified by the given
-        ID
-      operationId: patch
-      parameters:
-      - name: id
-        in: path
-        description: Logical ID of the entity
-        required: true
-        schema:
-          type: string
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/AgentDto'
-        required: true
-      responses:
-        "200":
-          description: OK
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/AgentDto'
   /api/v1/agents/{id}/group:
     get:
       tags:
@@ -807,7 +807,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProductDto'
+              $ref: '#/components/schemas/CreateProductRequest'
         required: true
       responses:
         "201":
@@ -1168,6 +1168,51 @@ components:
           format: int32
           example: 150
       description: Product data transfer object
+    CreateProductRequest:
+      required:
+      - category
+      - name
+      - price
+      type: object
+      properties:
+        name:
+          maxLength: 100
+          minLength: 2
+          type: string
+          description: Product name
+          nullable: false
+          example: Wireless Keyboard
+        description:
+          maxLength: 500
+          type: string
+          description: Detailed description
+          example: Compact bluetooth keyboard
+        price:
+          maximum: 99999.99
+          minimum: 0.01
+          type: number
+          description: Unit price in EUR
+          nullable: false
+          example: 49.99
+        category:
+          pattern: "^[A-Z_]+$"
+          type: string
+          description: Product category code
+          nullable: false
+          example: ELECTRONICS
+          enum:
+          - ELECTRONICS
+          - CLOTHING
+          - FOOD
+          - BOOKS
+        stock:
+          maximum: 9999
+          minimum: 0
+          type: integer
+          description: Initial stock quantity
+          format: int32
+          example: 100
+      description: Payload for creating a new product
   securitySchemes:
     bearerAuth:
       type: http

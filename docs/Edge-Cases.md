@@ -65,3 +65,36 @@ When a concrete controller overrides a method and adds its own `@Operation`, the
 The abstract class declares methods with generic parameter types (`T`, `ID`). The plugin must resolve these to the concrete types used by the subclass (`ProductDto`, `Long` for `ProductController`; `AgentDto`, `String` for `AgentController`) when generating the schema references.
 
 **Verification:** `GET /api/v1/products/{id}` references `ProductDto`, not a raw or unresolved generic type.
+
+---
+
+## @Size default values are not emitted
+
+**Sample:** `CreateProductRequest` (`description` field annotated with `@Size(max=500)`)
+
+`@Size` has defaults `min=0` and `max=Integer.MAX_VALUE`. Emitting these defaults as-is would produce `minLength: 0` (redundant) and `maxLength: 2147483647` (misleading). The plugin must suppress both:
+
+- `min=0` → do **not** set `minLength`
+- `max=Integer.MAX_VALUE` → do **not** set `maxLength`
+
+**Verification:** The `description` property in `components/schemas/CreateProductRequest` has `maxLength: 500` but no `minLength` entry.
+
+---
+
+## Multiple constraints on the same field
+
+**Sample:** `CreateProductRequest` (`name` annotated with both `@NotBlank` and `@Size(min=2, max=100)`)
+
+Both constraints must be applied independently to the same schema property. The plugin must not short-circuit after the first matching annotation.
+
+**Verification:** The `name` property carries `nullable: false` (from `@NotBlank`), `minLength: 2` and `maxLength: 100` (from `@Size`) simultaneously.
+
+---
+
+## @JsonProperty name aliasing with validation constraints
+
+**Sample:** Any DTO field that combines `@JsonProperty` with a validation annotation
+
+When a field is serialised under a different name (via `@JsonProperty`), the plugin must apply the constraint to the aliased property name in the schema, not the raw Java field name.
+
+**Verification:** If a field `private String internalCode` is annotated `@JsonProperty("code")` and `@NotBlank`, the constraint must appear on the `code` property in `components/schemas`, not on `internalCode`.

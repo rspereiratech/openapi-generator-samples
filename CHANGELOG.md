@@ -8,8 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 ## [Unreleased] — 1.1.0-SNAPSHOT
 
+### Added
+
+- `CreateProductRequest` — new DTO exercising all supported Jakarta Bean Validation constraints (`@NotBlank`, `@NotNull`, `@Size`, `@DecimalMin`, `@DecimalMax`, `@Min`, `@Max`, `@Pattern`) so every constraint-to-schema mapping has a concrete verifiable sample
+- `jakarta.validation-api` dependency added to `pom.xml`
+- Scenario 6 (Bean Validation Constraints) added to `docs/Scenarios.md`
+- Three new edge-case entries in `docs/Edge-Cases.md`: `@Size` default suppression, multiple constraints on one field, and `@JsonProperty` name aliasing
+
 ### Changed
 
+- `ProductController.createProduct` now accepts `CreateProductRequest` instead of `ProductDto`
 - Bumped version to `1.1.0-SNAPSHOT` to open the next development cycle
 - Regenerated `docs/swagger/openapi.yaml` to reflect current sample state
 - Moved `maven.deploy.skip` property below `description` in `pom.xml` for consistency

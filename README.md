@@ -24,6 +24,7 @@ The project exercises a wide range of real-world annotation patterns so that eve
   - [Multi-Tag via Interface Hierarchy](#3-multi-tag-via-interface-hierarchy)
   - [Paginated Responses](#4-paginated-responses)
   - [Notification Subsystem](#5-notification-subsystem)
+  - [Bean Validation Constraints](#6-bean-validation-constraints)
 - [Generated OpenAPI Specification](#generated-openapi-specification)
 - [Plugin Configuration Reference](#plugin-configuration-reference)
 - [Building](#building)
@@ -45,6 +46,7 @@ The plugin generates an OpenAPI 3.0 document **at build time**, directly from co
 | Paginated response wrapper | `UserController` |
 | Security scheme (Bearer JWT) | Global |
 | Multiple server environments | pom.xml configuration |
+| Bean Validation constraints (`@NotBlank`, `@Size`, `@Min`, `@Max`, `@DecimalMin`, `@DecimalMax`, `@Pattern`) | `CreateProductRequest` |
 
 ---
 
@@ -87,6 +89,7 @@ openapi-generator-samples/
 │   └── dto/
 │       ├── AgentDto.java
 │       ├── AgentGroupDto.java
+│       ├── CreateProductRequest.java  # Bean Validation constraint sample
 │       ├── CreateUserRequest.java
 │       ├── NotificationDto.java
 │       ├── NotificationProviderDto.java
@@ -193,6 +196,23 @@ The generator collects **both** tags so every Agent operation is published under
 **Files:** `controller/EmailNotificationController.java`, `api/AbstractNotificationController.java`, `api/NotificationApi.java`
 
 This group shows how operations defined across an abstract class and an interface are merged onto a single controller path (`/api/v1/notifications`), covering: send, get, cancel, list pending, list providers, and health check.
+
+### 6. Bean Validation Constraints
+
+**File:** `dto/CreateProductRequest.java`
+
+`CreateProductRequest` is the primary sample for Bean Validation constraint propagation. Every supported Jakarta constraint annotation is applied to at least one field:
+
+```java
+@NotBlank @Size(min = 2, max = 100)  String name,       // nullable:false, minLength:2, maxLength:100
+@Size(max = 500)                      String description, // maxLength:500
+@NotNull @DecimalMin("0.01")
+         @DecimalMax("99999.99")      BigDecimal price,   // nullable:false, minimum:0.01, maximum:99999.99
+@NotNull @Pattern(regexp="^[A-Z_]+$") String category,   // nullable:false, pattern:^[A-Z_]+$
+@Min(0)  @Max(9999)                   int stock           // minimum:0, maximum:9999
+```
+
+The generator reads the annotations directly from the compiled `.class` file and applies them to the corresponding property in `components/schemas/CreateProductRequest`. No Spring context or runtime is required.
 
 ---
 

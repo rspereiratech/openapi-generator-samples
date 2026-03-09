@@ -11,6 +11,7 @@
 package io.github.rspereiratech.openapi.generator.samples.controller;
 
 import io.github.rspereiratech.openapi.generator.samples.api.AbstractCrudApi;
+import io.github.rspereiratech.openapi.generator.samples.dto.CreateProductRequest;
 import io.github.rspereiratech.openapi.generator.samples.dto.ProductDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -55,9 +56,9 @@ public class ProductController extends AbstractCrudApi<ProductDto, Long> {
 
     @Operation(summary = "Create product", description = "Adds a new product to the catalogue.")
     @PostMapping
-    public ProductDto createProduct(@RequestBody ProductDto product) {
-        return new ProductDto(100L, product.name(), product.description(),
-                product.price(), product.category(), product.stock());
+    public ProductDto createProduct(@RequestBody CreateProductRequest request) {
+        return new ProductDto(100L, request.name(), request.description(),
+                request.price(), request.category(), request.stock());
     }
 
     @Operation(summary = "List products by category",

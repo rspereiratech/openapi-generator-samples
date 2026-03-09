@@ -166,3 +166,63 @@ Walk both the superclass chain and the interface list, collect all six operation
 ### Expected output
 
 `/api/v1/notifications` exposes: `POST /`, `GET /{id}`, `DELETE /{id}`, `GET /pending`, `GET /providers`, `GET /health`.
+
+---
+
+## 6. Bean Validation Constraints
+
+**DTO:** `dto/CreateProductRequest.java`
+**Controller:** `ProductController` (`POST /api/v1/products`)
+**Plugin capability tested:** Mapping Jakarta Bean Validation annotations to OpenAPI schema properties
+
+### What it does
+
+`CreateProductRequest` applies every supported Jakarta validation constraint across its five fields so that each constraint type has a concrete, verifiable representation in the generated schema:
+
+```java
+@NotBlank
+@Size(min = 2, max = 100)
+String name,
+
+@Size(max = 500)
+String description,
+
+@NotNull
+@DecimalMin("0.01")
+@DecimalMax("99999.99")
+BigDecimal price,
+
+@NotNull
+@Pattern(regexp = "^[A-Z_]+$")
+String category,
+
+@Min(0)
+@Max(9999)
+int stock
+```
+
+### What the plugin must do
+
+After Swagger's `ModelConverters` generates the base schema for `CreateProductRequest`, the plugin walks all reachable fields, reads their annotations, and enriches the corresponding schema property:
+
+| Annotation | Field | OpenAPI property set |
+|---|---|---|
+| `@NotBlank` | `name` | `nullable: false` |
+| `@Size(min=2, max=100)` | `name` | `minLength: 2`, `maxLength: 100` |
+| `@Size(max=500)` | `description` | `maxLength: 500` |
+| `@NotNull` | `price` | `nullable: false` |
+| `@DecimalMin("0.01")` | `price` | `minimum: 0.01` |
+| `@DecimalMax("99999.99")` | `price` | `maximum: 99999.99` |
+| `@NotNull` | `category` | `nullable: false` |
+| `@Pattern(regexp="^[A-Z_]+$")` | `category` | `pattern: ^[A-Z_]+$` |
+| `@Min(0)` | `stock` | `minimum: 0` |
+| `@Max(9999)` | `stock` | `maximum: 9999` |
+
+### Expected output
+
+`components/schemas/CreateProductRequest` contains:
+- `name`: `nullable: false`, `minLength: 2`, `maxLength: 100`
+- `description`: `maxLength: 500`
+- `price`: `nullable: false`, `minimum: 0.01`, `maximum: 99999.99`
+- `category`: `nullable: false`, `pattern: ^[A-Z_]+$`
+- `stock`: `minimum: 0`, `maximum: 9999`
