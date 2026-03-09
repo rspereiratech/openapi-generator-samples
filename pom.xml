@@ -13,6 +13,10 @@
     <artifactId>openapi-generator-samples</artifactId>
 
     <name>OpenAPI Generator - Samples</name>
+
+    <properties>
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
     <description>
         Sample Spring MVC application used to validate the openapi-generator-maven-plugin.
         The openapi.yaml is generated from compiled classes during the process-classes phase.
