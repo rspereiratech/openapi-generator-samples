@@ -86,6 +86,7 @@
                     <controllerAnnotations>
                         <controllerAnnotation>io.github.rspereiratech.openapi.generator.samples.annotation.CustomRestController</controllerAnnotation>
                     </controllerAnnotations>
+                    <sortOutput>true</sortOutput>
                     <securitySchemes>
                         <securityScheme>
                             <name>bearerAuth</name>

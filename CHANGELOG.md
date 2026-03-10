@@ -19,8 +19,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
 - `ProductController.createProduct` now accepts `CreateProductRequest` instead of `ProductDto`
 - Bumped version to `1.1.0-SNAPSHOT` to open the next development cycle
-- Regenerated `docs/swagger/openapi.yaml` to reflect current sample state
+- Regenerated `docs/swagger/openapi.yaml` to reflect current sample state — paths are now sorted alphabetically
 - Moved `maven.deploy.skip` property below `description` in `pom.xml` for consistency
+- Enabled `sortOutput=true` in the plugin configuration so the generated spec is byte-for-byte identical across machines and builds
 
 ---
 
