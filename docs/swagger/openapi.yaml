@@ -878,28 +878,44 @@ components:
           description: Display name of the agent group
           example: Tier-1 Support
       description: Agent group data transfer object
-    NotificationProviderDto:
+    SendNotificationRequest:
       required:
-      - name
+      - body
+      - recipient
+      - subject
+      - type
       type: object
       properties:
-        name:
-          type: string
-          description: Provider name
-          example: sendgrid
         type:
           type: string
-          description: Channel type handled by this provider
+          description: Delivery channel
           example: EMAIL
           enum:
           - EMAIL
           - SMS
           - PUSH
-        available:
-          type: boolean
-          description: Whether the provider is currently reachable
-          example: true
-      description: Notification provider descriptor
+        recipient:
+          type: string
+          description: "Recipient address (email, phone number, or device token)"
+          example: user@example.com
+        subject:
+          type: string
+          description: Message subject or title
+          example: Your order has shipped
+        body:
+          type: string
+          description: Full message body
+          example: "Your order #42 is on its way!"
+        priority:
+          type: string
+          description: Delivery priority
+          example: NORMAL
+          default: NORMAL
+          enum:
+          - LOW
+          - NORMAL
+          - HIGH
+      description: Payload for dispatching a notification
     NotificationDto:
       required:
       - recipient
@@ -949,44 +965,28 @@ components:
           format: date-time
           readOnly: true
       description: Notification data transfer object
-    SendNotificationRequest:
+    NotificationProviderDto:
       required:
-      - body
-      - recipient
-      - subject
-      - type
+      - name
       type: object
       properties:
+        name:
+          type: string
+          description: Provider name
+          example: sendgrid
         type:
           type: string
-          description: Delivery channel
+          description: Channel type handled by this provider
           example: EMAIL
           enum:
           - EMAIL
           - SMS
           - PUSH
-        recipient:
-          type: string
-          description: "Recipient address (email, phone number, or device token)"
-          example: user@example.com
-        subject:
-          type: string
-          description: Message subject or title
-          example: Your order has shipped
-        body:
-          type: string
-          description: Full message body
-          example: "Your order #42 is on its way!"
-        priority:
-          type: string
-          description: Delivery priority
-          example: NORMAL
-          default: NORMAL
-          enum:
-          - LOW
-          - NORMAL
-          - HIGH
-      description: Payload for dispatching a notification
+        available:
+          type: boolean
+          description: Whether the provider is currently reachable
+          example: true
+      description: Notification provider descriptor
     OrderDto:
       required:
       - customerId
