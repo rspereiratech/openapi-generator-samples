@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * REST controller implementing {@link UserApi}.
@@ -34,7 +35,7 @@ import java.util.List;
 public class UserController implements UserApi {
 
     @Override
-    public PagedResponse<UserDto> listUsers(String name, String role, int page, int size) {
+    public PagedResponse<UserDto> listUsers(String name, String role, int page, int size, Locale locale) {
         return new PagedResponse<>(List.of(stubUser(1L), stubUser(2L)), page, size, 2);
     }
 

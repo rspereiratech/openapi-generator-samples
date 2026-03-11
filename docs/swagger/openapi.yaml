@@ -151,12 +151,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/AgentDto'
-        "404":
-          description: Entity not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/AgentDto'
         "401":
           description: Unauthorized
           content:
@@ -165,6 +159,12 @@ paths:
                 $ref: '#/components/schemas/AgentDto'
         "403":
           description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "404":
+          description: Entity not found
           content:
             '*/*':
               schema:
@@ -191,7 +191,31 @@ paths:
         required: true
       responses:
         "200":
-          description: OK
+          description: Entity updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "400":
+          description: Invalid request data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "404":
+          description: Entity not found
           content:
             '*/*':
               schema:
@@ -213,12 +237,12 @@ paths:
       responses:
         "204":
           description: Entity deleted successfully
-        "404":
-          description: Entity not found
         "401":
           description: Unauthorized
         "403":
           description: Forbidden
+        "404":
+          description: Entity not found
     patch:
       tags:
       - Generic REST API
@@ -242,7 +266,31 @@ paths:
         required: true
       responses:
         "200":
-          description: OK
+          description: Entity patched successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "400":
+          description: Invalid patch data
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "401":
+          description: Unauthorized
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "403":
+          description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentDto'
+        "404":
+          description: Entity not found
           content:
             '*/*':
               schema:
@@ -269,12 +317,6 @@ paths:
             '*/*':
               schema:
                 type: boolean
-        "404":
-          description: Entity not found
-          content:
-            '*/*':
-              schema:
-                type: boolean
         "401":
           description: Unauthorized
           content:
@@ -283,6 +325,12 @@ paths:
                 type: boolean
         "403":
           description: Forbidden
+          content:
+            '*/*':
+              schema:
+                type: boolean
+        "404":
+          description: Entity not found
           content:
             '*/*':
               schema:
@@ -310,12 +358,6 @@ paths:
             '*/*':
               schema:
                 $ref: '#/components/schemas/AgentGroupDto'
-        "404":
-          description: Agent or group not found
-          content:
-            '*/*':
-              schema:
-                $ref: '#/components/schemas/AgentGroupDto'
         "401":
           description: Unauthorized
           content:
@@ -324,6 +366,12 @@ paths:
                 $ref: '#/components/schemas/AgentGroupDto'
         "403":
           description: Forbidden
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/AgentGroupDto'
+        "404":
+          description: Agent or group not found
           content:
             '*/*':
               schema:
@@ -648,7 +696,9 @@ paths:
       - users
       summary: List users
       description: "Returns a paginated list of users, optionally filtered by name\
-        \ or role."
+        \ or role. The optional {@code locale} parameter demonstrates that a normally-ignored\
+        \ type (java.util.Locale) is included in the spec when an explicit @Parameter(schema\
+        \ = @Schema(type = \"string\")) override is declared."
       operationId: listUsers
       parameters:
       - name: name
@@ -681,6 +731,15 @@ paths:
           type: integer
           format: int32
         example: "20"
+      - name: locale
+        in: query
+        description: "BCP-47 language tag for response localisation (e.g. en-US, pt-BR).\
+          \ Demonstrates that ignored types (java.util.Locale) are included when an\
+          \ explicit @Parameter(schema=@Schema(type=\"string\")) override is present."
+        required: false
+        schema:
+          type: string
+        example: en-US
       responses:
         "200":
           description: Page of users returned successfully
@@ -813,7 +872,19 @@ paths:
         required: true
       responses:
         "200":
-          description: OK
+          description: User updated successfully
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        "400":
+          description: Validation error in request body
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/UserDto'
+        "404":
+          description: User not found
           content:
             '*/*':
               schema:

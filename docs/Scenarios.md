@@ -226,3 +226,81 @@ After Swagger's `ModelConverters` generates the base schema for `CreateProductRe
 - `price`: `nullable: false`, `minimum: 0.01`, `maximum: 99999.99`
 - `category`: `nullable: false`, `pattern: ^[A-Z_]+$`
 - `stock`: `minimum: 0`, `maximum: 9999`
+
+---
+
+## 7. Ignored-Type Override via `@Parameter(schema = @Schema(type = "string"))`
+
+**Controller:** `UserController`
+**Interface:** `api/UserApi.java` (`listUsers`)
+**Plugin capability tested:** Including an otherwise-ignored parameter type in the spec when an explicit `@Parameter(schema=…)` annotation is present
+
+### What it does
+
+`java.util.Locale` is part of the built-in ignored-type list (mirroring SpringDoc's defaults). It would normally be silently dropped from the generated parameter list. `UserApi.listUsers` annotates the `Locale` parameter with:
+
+```java
+@Parameter(
+    description = "BCP-47 language tag for response localisation ...",
+    schema      = @Schema(type = "string"),
+    example     = "en-US"
+)
+@RequestParam(required = false) Locale locale
+```
+
+The explicit `schema = @Schema(type = "string")` signals to the plugin that the developer intentionally wants this parameter in the spec, even though `Locale` would otherwise be ignored.
+
+### What the plugin must do
+
+When a parameter's type is in the ignored set, check whether a `@Parameter(schema=@Schema(type=...))` or `@Parameter(schema=@Schema(implementation=...))` override is present. If it is, emit the parameter using the declared schema instead of skipping it entirely.
+
+### Expected output
+
+`GET /api/v1/users` includes a `locale` query parameter with:
+```yaml
+- name: locale
+  in: query
+  required: false
+  schema:
+    type: string
+  example: en-US
+```
+
+---
+
+## 8. PUT/PATCH with Explicit `@ApiResponse` Annotations
+
+**Controllers:** `AgentController` (via `GenericVertexRestController`), `UserController` (via `UserApi`)
+**Plugin capability tested:** PUT and PATCH operations correctly picking up explicit `@ApiResponse` annotations instead of falling back to a single default "OK" response
+
+### What it does
+
+`GenericVertexRestController` declares PUT and PATCH with explicit `@ApiResponses`:
+
+```java
+@ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Entity updated successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid request data"),
+    @ApiResponse(responseCode = "404", description = "Entity not found"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+    @ApiResponse(responseCode = "403", description = "Forbidden")
+})
+@PutMapping("/{id}")
+T update(...);
+```
+
+Similarly, `UserApi.updateUser` declares `@ApiResponse(200)`, `@ApiResponse(400)`, and `@ApiResponse(404)`.
+
+Before the `ResponseProcessorImpl` fix, PUT and PATCH bypassed explicit `@ApiResponse` annotations and always fell back to the HTTP-method inference (which produces a single "200 OK"). After the fix, explicit annotations are detected and emitted correctly for all HTTP methods including PUT and PATCH.
+
+### What the plugin must do
+
+`ResponseProcessorImpl.processResponses` must check for explicit `@ApiResponse`/`@ApiResponses` annotations before falling back to default HTTP-method inference, regardless of whether the method is GET, POST, PUT, PATCH, or DELETE.
+
+### Expected output
+
+`PUT /api/v1/agents/{id}` emits five responses: 200, 400, 401, 403, 404 — each with a meaningful description matching the annotation, not a generic "OK".
+
+`PATCH /api/v1/agents/{id}` emits five responses: 200, 400, 401, 403, 404.
+
+`PUT /api/v1/users/{id}` emits three responses: 200, 400, 404.

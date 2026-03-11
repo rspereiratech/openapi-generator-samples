@@ -25,6 +25,8 @@ The project exercises a wide range of real-world annotation patterns so that eve
   - [Paginated Responses](#4-paginated-responses)
   - [Notification Subsystem](#5-notification-subsystem)
   - [Bean Validation Constraints](#6-bean-validation-constraints)
+  - [Ignored-Type Override via @Parameter schema](#7-ignored-type-override-via-parameter-schema)
+  - [PUT/PATCH with Explicit @ApiResponse](#8-putpatch-with-explicit-apiresponse)
 - [Generated OpenAPI Specification](#generated-openapi-specification)
 - [Plugin Configuration Reference](#plugin-configuration-reference)
 - [Building](#building)
@@ -47,6 +49,8 @@ The plugin generates an OpenAPI 3.0 document **at build time**, directly from co
 | Security scheme (Bearer JWT) | Global |
 | Multiple server environments | pom.xml configuration |
 | Bean Validation constraints (`@NotBlank`, `@Size`, `@Min`, `@Max`, `@DecimalMin`, `@DecimalMax`, `@Pattern`) | `CreateProductRequest` |
+| Ignored-type override via `@Parameter(schema = @Schema(type = "string"))` | `UserApi.listUsers` (`Locale` parameter) |
+| PUT/PATCH with explicit `@ApiResponse` annotations | `GenericVertexRestController.update/patch`, `UserApi.updateUser` |
 
 ---
 
@@ -213,6 +217,53 @@ This group shows how operations defined across an abstract class and an interfac
 ```
 
 The generator reads the annotations directly from the compiled `.class` file and applies them to the corresponding property in `components/schemas/CreateProductRequest`. No Spring context or runtime is required.
+
+---
+
+### 7. Ignored-Type Override via @Parameter schema
+
+**File:** `api/UserApi.java` (`listUsers`)
+
+`java.util.Locale` is in the built-in ignored-type set (mirroring SpringDoc's defaults) and would normally be silently dropped from the generated spec. The `listUsers` method overrides this behaviour with an explicit schema annotation:
+
+```java
+@Parameter(
+    description = "BCP-47 language tag for response localisation ...",
+    schema      = @Schema(type = "string"),
+    example     = "en-US"
+)
+@RequestParam(required = false) Locale locale
+```
+
+The generator detects the explicit `schema = @Schema(type = "string")` on the `@Parameter` annotation and includes the parameter in the spec using the declared schema, instead of ignoring it.
+
+**Verification:** `GET /api/v1/users` includes a `locale` query parameter with `schema.type: string` and `example: en-US`.
+
+---
+
+### 8. PUT/PATCH with Explicit @ApiResponse
+
+**Files:** `api/GenericVertexRestController.java` (`update`, `patch`), `api/UserApi.java` (`updateUser`)
+
+PUT and PATCH operations carry explicit `@ApiResponse` annotations that must appear in the spec. This scenario validates that the generator processes these annotations for all HTTP methods — not just GET and POST.
+
+`GenericVertexRestController` declares five responses for both PUT and PATCH:
+
+```java
+@ApiResponses({
+    @ApiResponse(responseCode = "200", description = "Entity updated successfully"),
+    @ApiResponse(responseCode = "400", description = "Invalid request data"),
+    @ApiResponse(responseCode = "404", description = "Entity not found"),
+    @ApiResponse(responseCode = "401", description = "Unauthorized"),
+    @ApiResponse(responseCode = "403", description = "Forbidden")
+})
+@PutMapping("/{id}")
+T update(...);
+```
+
+`UserApi.updateUser` declares three responses (200, 400, 404).
+
+**Verification:** `PUT /api/v1/agents/{id}` and `PATCH /api/v1/agents/{id}` each emit five response entries. `PUT /api/v1/users/{id}` emits three response entries — all with descriptions from the annotations, not the generic "OK" fallback.
 
 ---
 

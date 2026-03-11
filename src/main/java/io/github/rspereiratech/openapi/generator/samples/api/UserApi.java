@@ -15,6 +15,7 @@ import io.github.rspereiratech.openapi.generator.samples.dto.PagedResponse;
 import io.github.rspereiratech.openapi.generator.samples.dto.UserDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,6 +30,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.util.Locale;
+
 /**
  * Contract for the User resource.
  *
@@ -36,6 +39,11 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  * annotations are co-located here so that the interface acts as both the
  * routing contract and the API documentation source.  The implementing
  * {@code UserController} only needs {@code @RestController}.
+ *
+ * <p>The {@code listUsers} method also demonstrates that a normally-ignored
+ * parameter type ({@link java.util.Locale}) is included in the spec when an
+ * explicit {@code @Parameter(schema = @Schema(type = "string"))} override is
+ * declared on it.
   *
  * @author ruispereira
  */
@@ -50,6 +58,9 @@ public interface UserApi {
     @Operation(
             summary     = "List users",
             description = "Returns a paginated list of users, optionally filtered by name or role."
+                        + " The optional {@code locale} parameter demonstrates that a normally-ignored"
+                        + " type (java.util.Locale) is included in the spec when an explicit"
+                        + " @Parameter(schema = @Schema(type = \"string\")) override is declared."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Page of users returned successfully"),
@@ -67,7 +78,21 @@ public interface UserApi {
             @RequestParam(defaultValue = "0") int page,
 
             @Parameter(description = "Page size (max 100)", example = "20")
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20") int size,
+
+            /**
+             * Locale is normally an ignored type and would be silently dropped from the spec.
+             * The explicit {@code @Parameter(schema = @Schema(type = "string"))} annotation
+             * overrides the ignore rule and forces it to appear as a BCP-47 language tag.
+             */
+            @Parameter(
+                    description = "BCP-47 language tag for response localisation (e.g. en-US, pt-BR)."
+                                + " Demonstrates that ignored types (java.util.Locale) are included"
+                                + " when an explicit @Parameter(schema=@Schema(type=\"string\")) override is present.",
+                    schema = @Schema(type = "string"),
+                    example = "en-US"
+            )
+            @RequestParam(required = false) Locale locale
     );
 
     @Operation(

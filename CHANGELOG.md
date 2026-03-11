@@ -14,6 +14,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - `jakarta.validation-api` dependency added to `pom.xml`
 - Scenario 6 (Bean Validation Constraints) added to `docs/Scenarios.md`
 - Three new edge-case entries in `docs/Edge-Cases.md`: `@Size` default suppression, multiple constraints on one field, and `@JsonProperty` name aliasing
+- `UserApi.listUsers` now accepts a `java.util.Locale` parameter annotated with `@Parameter(schema = @Schema(type = "string"))` — demonstrates Scenario 7: ignored-type override via explicit schema annotation (Scenario 7 added to `docs/Scenarios.md`, edge case added to `docs/Edge-Cases.md`)
+- `GenericVertexRestController.update` (PUT) and `.patch` (PATCH) already carried explicit `@ApiResponse` annotations; these now correctly appear in the spec after the `ResponseProcessorImpl` fix — the generated `PUT /api/v1/agents/{id}` and `PATCH /api/v1/agents/{id}` now emit all five explicit responses instead of a single default "OK" (Scenario 8 added to `docs/Scenarios.md`, edge case added to `docs/Edge-Cases.md`)
+- `UserApi.updateUser` (PUT) already carried `@ApiResponse(200)`, `@ApiResponse(400)`, `@ApiResponse(404)` — these now appear correctly in the generated `PUT /api/v1/users/{id}` entry
 
 ### Changed
 
@@ -22,6 +25,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 - Regenerated `docs/swagger/openapi.yaml` to reflect current sample state — paths are now sorted alphabetically
 - Moved `maven.deploy.skip` property below `description` in `pom.xml` for consistency
 - Enabled `sortOutput=true` in the plugin configuration so the generated spec is byte-for-byte identical across machines and builds
+- Regenerated `docs/swagger/openapi.yaml` after adding the `locale` parameter and fixing PUT/PATCH response processing — `GET /api/v1/users` now contains a `locale` query parameter; PUT and PATCH operations now list all explicit response codes
 
 ---
 

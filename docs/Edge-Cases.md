@@ -98,3 +98,31 @@ Both constraints must be applied independently to the same schema property. The 
 When a field is serialised under a different name (via `@JsonProperty`), the plugin must apply the constraint to the aliased property name in the schema, not the raw Java field name.
 
 **Verification:** If a field `private String internalCode` is annotated `@JsonProperty("code")` and `@NotBlank`, the constraint must appear on the `code` property in `components/schemas`, not on `internalCode`.
+
+---
+
+## Ignored parameter type overridden by `@Parameter(schema = @Schema(type = ...))`
+
+**Sample:** `UserApi.listUsers` — `Locale locale` parameter
+
+`java.util.Locale` is in the built-in ignored-type set. Normally the plugin silently skips it. When the parameter carries an explicit `@Parameter(schema = @Schema(type = "string"))`, the ignore rule must be lifted and the parameter must appear in the spec using the declared schema.
+
+**Problematic behaviour (without the feature):** The `locale` parameter is silently absent from `GET /api/v1/users`.
+
+**Correct behaviour:** The ignore check must first call `extractExplicitParameterSchema`. If that returns a non-empty `Optional`, the parameter is emitted with the overridden schema instead of being dropped.
+
+**Verification:** `GET /api/v1/users` in `openapi.yaml` contains a `locale` query parameter with `schema.type: string` and `example: en-US`.
+
+---
+
+## PUT and PATCH bypassing explicit `@ApiResponse` annotations
+
+**Sample:** `GenericVertexRestController.update` (PUT), `GenericVertexRestController.patch` (PATCH), `UserApi.updateUser` (PUT)
+
+Before the `ResponseProcessorImpl` fix, the response processor only consulted explicit `@ApiResponse` annotations for non-PUT/PATCH methods. For PUT and PATCH it fell through to the default HTTP-method inference, producing a single `"200": description: OK` response regardless of any `@ApiResponse` annotations present.
+
+**Problematic behaviour (before fix):** `PUT /api/v1/agents/{id}` emits only `"200": description: OK` even though the interface declares five `@ApiResponse` entries.
+
+**Correct behaviour:** `processExplicitApiResponses` must be called for every HTTP method. Its result must take precedence over the default-response fallback for PUT and PATCH exactly as it does for GET and POST.
+
+**Verification:** `PUT /api/v1/agents/{id}` carries responses 200, 400, 401, 403, 404 — each with descriptions from the `@ApiResponse` annotations, not a generic "OK". The same applies to `PATCH /api/v1/agents/{id}` (200, 400, 401, 403, 404) and `PUT /api/v1/users/{id}` (200, 400, 404).
