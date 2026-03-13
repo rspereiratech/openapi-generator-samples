@@ -533,6 +533,50 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/ProductDto'
+  /api/v1/products/search:
+    get:
+      tags:
+      - products
+      summary: Search products
+      description: "Returns a paginated, optionally filtered list of products. Pagination\
+        \ is controlled via the virtual page/size/sort parameters."
+      operationId: search
+      parameters:
+      - name: category
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: Zero-based page index (0..N)
+        required: false
+        schema:
+          type: integer
+          format: int32
+        example: "0"
+      - name: size
+        in: query
+        description: Number of records per page
+        required: false
+        schema:
+          type: integer
+          format: int32
+        example: "20"
+      - name: sort
+        in: query
+        description: "Sort criteria: property(,asc|desc). Multiple values supported."
+        required: false
+        schema:
+          type: string
+        example: "name,asc"
+      responses:
+        "200":
+          description: Paginated product list
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/PageProductDto'
   /api/v1/products/{id}:
     get:
       tags:
@@ -998,6 +1042,73 @@ components:
           format: int32
           example: 150
       description: Product data transfer object
+    SortObject:
+      type: object
+      properties:
+        direction:
+          type: string
+        nullHandling:
+          type: string
+        ascending:
+          type: boolean
+        property:
+          type: string
+        ignoreCase:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        paged:
+          type: boolean
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        unpaged:
+          type: boolean
+    PageProductDto:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductDto'
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        empty:
+          type: boolean
     CreateProductRequest:
       required:
       - category
