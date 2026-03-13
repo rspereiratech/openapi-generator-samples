@@ -304,3 +304,87 @@ Before the `ResponseProcessorImpl` fix, PUT and PATCH bypassed explicit `@ApiRes
 `PATCH /api/v1/agents/{id}` emits five responses: 200, 400, 401, 403, 404.
 
 `PUT /api/v1/users/{id}` emits three responses: 200, 400, 404.
+
+---
+
+## 9. `@Schema` Annotation Enrichment on Records and POJOs
+
+**DTOs:** `ProductDto`, `CreateProductRequest`
+**Plugin capability tested:** `SchemaAnnotationEnricher` correctly propagating `@Schema` attributes — description, example, format, accessMode, allowableValues, defaultValue — for Java records where `ModelConverters` does not reliably pick them up
+
+### What it does
+
+`ProductDto` is a Java record annotated with `@Schema` at class and field level:
+
+```java
+@Schema(description = "Product data transfer object")
+public record ProductDto(
+    @Schema(description = "Unique identifier", example = "1", accessMode = Schema.AccessMode.READ_ONLY)
+    Long id,
+
+    @Schema(description = "Product category", example = "ELECTRONICS",
+            allowableValues = {"ELECTRONICS", "CLOTHING", "FOOD", "BOOKS"})
+    String category,
+
+    @Schema(description = "Unit price in EUR", example = "49.99")
+    BigDecimal price,
+    ...
+)
+```
+
+`CreateProductRequest` combines Bean Validation constraints with `@Schema` metadata on the same fields, exercising the interaction between `ValidationSchemaEnricher` (which runs first) and `SchemaAnnotationEnricher` (which runs second with non-overwriting policy).
+
+### What the plugin must do
+
+After `ModelConverters` resolves the record's schema, `SchemaAnnotationEnricher` must:
+1. Apply `description` at schema component level from the class-level `@Schema`
+2. Apply `description`, `example`, `format`, `defaultValue`, `nullable`, `readOnly`/`writeOnly`/`accessMode`, `deprecated`, `pattern`, `minimum`/`maximum`, `minLength`/`maxLength`, `allowableValues` at property level
+3. For `@Schema(hidden = true)` fields — remove the property from `properties` and `required`
+4. Not overwrite any value already set by `ValidationSchemaEnricher` (non-overwriting policy)
+
+### Expected output
+
+`components/schemas/ProductDto`:
+```yaml
+ProductDto:
+  type: object
+  description: Product data transfer object
+  properties:
+    id:
+      type: integer
+      format: int64
+      readOnly: true
+      example: "1"
+      description: Unique identifier
+    category:
+      type: string
+      description: Product category
+      example: ELECTRONICS
+      enum:
+        - ELECTRONICS
+        - CLOTHING
+        - FOOD
+        - BOOKS
+    price:
+      type: number
+      description: Unit price in EUR
+      example: "49.99"
+```
+
+`components/schemas/CreateProductRequest` additionally reflects Bean Validation constraints alongside `@Schema` metadata:
+```yaml
+  properties:
+    name:
+      type: string
+      description: Product name
+      example: Wireless Keyboard
+      nullable: false    # from @NotBlank
+      minLength: 2       # from @Size(min=2)
+      maxLength: 100     # from @Size(max=100)
+    price:
+      type: number
+      description: Unit price in EUR
+      nullable: false    # from @NotNull
+      minimum: 0.01      # from @DecimalMin
+      maximum: 99999.99  # from @DecimalMax
+```

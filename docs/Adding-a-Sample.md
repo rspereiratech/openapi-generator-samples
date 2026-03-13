@@ -31,19 +31,33 @@ Examples of good motivations:
 
 ## 2. Create the DTO
 
-Add a record or class under `src/main/java/.../dto/`. Annotate fields with `@Schema` for documentation:
+Add a record or class under `src/main/java/.../dto/`. Annotate fields with `@Schema` for documentation.
+
+The `SchemaAnnotationEnricher` picks up all standard `@Schema` attributes. Common usage:
 
 ```java
 @Schema(description = "Widget data transfer object")
 public record WidgetDto(
 
-    @Schema(description = "Unique identifier", readOnly = true, example = "1")
+    @Schema(description = "Unique identifier", example = "1",
+            accessMode = Schema.AccessMode.READ_ONLY)
     Long id,
 
-    @Schema(description = "Widget name", example = "Sprocket")
-    @NotBlank String name
+    @Schema(description = "Widget name", example = "Sprocket",
+            minLength = 1, maxLength = 100)
+    @NotBlank String name,
+
+    @Schema(description = "Widget status",
+            allowableValues = {"ACTIVE", "INACTIVE"},
+            defaultValue = "ACTIVE")
+    String status,
+
+    @Schema(hidden = true)   // removed from generated schema
+    String internalCode
 ) {}
 ```
+
+See [Schema-Handlers](../../openapi-generator-core/docs/Schema-Handlers.md#modelconverterstypeschemahandler) for the full list of supported `@Schema` attributes.
 
 Keep DTOs minimal — only the fields needed to illustrate the scenario.
 

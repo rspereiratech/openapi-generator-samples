@@ -79,10 +79,10 @@ public interface GenericVertexRestController<T, ID> {
     @GetMapping
     List<T> getAll(
             @Parameter(description = "Page number (0-based)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "0", required = false) int page,
 
             @Parameter(description = "Page size", example = "20")
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20", required = false) int size
     );
 
     @Operation(summary = "Check if entity exists",

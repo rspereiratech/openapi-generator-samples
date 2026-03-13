@@ -27,6 +27,7 @@ The project exercises a wide range of real-world annotation patterns so that eve
   - [Bean Validation Constraints](#6-bean-validation-constraints)
   - [Ignored-Type Override via @Parameter schema](#7-ignored-type-override-via-parameter-schema)
   - [PUT/PATCH with Explicit @ApiResponse](#8-putpatch-with-explicit-apiresponse)
+  - [@Schema Annotation Enrichment on Records](#9-schema-annotation-enrichment-on-records-and-pojos)
 - [Generated OpenAPI Specification](#generated-openapi-specification)
 - [Plugin Configuration Reference](#plugin-configuration-reference)
 - [Building](#building)
@@ -51,6 +52,7 @@ The plugin generates an OpenAPI 3.0 document **at build time**, directly from co
 | Bean Validation constraints (`@NotBlank`, `@Size`, `@Min`, `@Max`, `@DecimalMin`, `@DecimalMax`, `@Pattern`) | `CreateProductRequest` |
 | Ignored-type override via `@Parameter(schema = @Schema(type = "string"))` | `UserApi.listUsers` (`Locale` parameter) |
 | PUT/PATCH with explicit `@ApiResponse` annotations | `GenericVertexRestController.update/patch`, `UserApi.updateUser` |
+| `@Schema` enrichment on records — `description`, `example`, `format`, `accessMode`, `allowableValues`, `hidden`, numeric/length constraints | `ProductDto`, `CreateProductRequest` |
 
 ---
 

@@ -75,10 +75,10 @@ public interface UserApi {
             @RequestParam(required = false) String role,
 
             @Parameter(description = "Page number (0-based)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "0", required = false) int page,
 
             @Parameter(description = "Page size (max 100)", example = "20")
-            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "20", required = false) int size,
 
             /**
              * Locale is normally an ignored type and would be silently dropped from the spec.
@@ -183,9 +183,9 @@ public interface UserApi {
             @RequestParam String q,
 
             @Parameter(description = "Page number (0-based)")
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "0", required = false) int page,
 
             @Parameter(description = "Page size")
-            @RequestParam(defaultValue = "20") int size
+            @RequestParam(defaultValue = "20", required = false) int size
     );
 }
