@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -68,7 +69,11 @@ public class OrderController {
     @Operation(summary = "Place a new order", description = "Creates a new order for the given customer.")
     @ApiResponse(responseCode = "201", description = "Order placed successfully")
     @PostMapping
-    public OrderDto createOrder(@RequestBody OrderDto order) {
+    public OrderDto createOrder(
+            @RequestBody OrderDto order,
+            @Parameter(description = "Optional client-generated idempotency key to prevent duplicate submissions",
+                       example = "550e8400-e29b-41d4-a716-446655440000")
+            @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey) {
         return new OrderDto(100L, order.customerId(), "PENDING", order.total(), LocalDateTime.now());
     }
 

@@ -300,9 +300,24 @@ paths:
         "202":
           description: Notification accepted for delivery
           content:
-            '*/*':
+            application/json:
               schema:
                 $ref: '#/components/schemas/NotificationDto'
+              examples:
+                email:
+                  summary: Email notification queued
+                  value:
+                    id: 1
+                    type: EMAIL
+                    recipient: user@example.com
+                    status: PENDING
+                sms:
+                  summary: SMS notification queued
+                  value:
+                    id: 2
+                    type: SMS
+                    recipient: "+351912345678"
+                    status: PENDING
         "400":
           description: Invalid request payload
         "503":
@@ -422,6 +437,15 @@ paths:
       summary: Place a new order
       description: Creates a new order for the given customer.
       operationId: createOrder
+      parameters:
+      - name: X-Idempotency-Key
+        in: header
+        description: Optional client-generated idempotency key to prevent duplicate
+          submissions
+        required: false
+        schema:
+          type: string
+        example: 550e8400-e29b-41d4-a716-446655440000
       requestBody:
         content:
           application/json:
@@ -836,11 +860,11 @@ components:
         ssoId:
           type: string
           description: SSO identifier
-          example: alice.smith@8x8.com
+          example: alice.smith@example.com
         ldapId:
           type: string
           description: LDAP identifier
-          example: "cn=alice,ou=agents,dc=8x8,dc=com"
+          example: "cn=alice,ou=agents,dc=example,dc=com"
       description: Agent data transfer object
     AgentGroupDto:
       required:
@@ -1114,6 +1138,7 @@ components:
       - category
       - name
       - price
+      - sku
       type: object
       properties:
         name:
@@ -1153,6 +1178,24 @@ components:
           description: Initial stock quantity
           format: int32
           example: 100
+        sku:
+          maxLength: 50
+          minLength: 1
+          type: string
+          description: Stock-keeping unit code
+          nullable: false
+          example: WKB-001
+        supplierEmail:
+          type: string
+          description: Supplier contact email
+          format: email
+          example: supplier@example.com
+        weight:
+          minimum: 0
+          type: integer
+          description: Weight in grams
+          format: int32
+          example: 350
       description: Payload for creating a new product
     PagedResponseUserDto:
       type: object

@@ -14,6 +14,9 @@ import io.github.rspereiratech.openapi.generator.samples.dto.NotificationDto;
 import io.github.rspereiratech.openapi.generator.samples.dto.SendNotificationRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -49,7 +52,26 @@ public interface NotificationApi {
             description = "Dispatches a notification to the given recipient via the requested channel."
     )
     @ApiResponses({
-            @ApiResponse(responseCode = "202", description = "Notification accepted for delivery"),
+            @ApiResponse(
+                    responseCode = "202",
+                    description = "Notification accepted for delivery",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = NotificationDto.class),
+                            examples = {
+                                    @ExampleObject(
+                                            name = "email",
+                                            summary = "Email notification queued",
+                                            value = "{\"id\":1,\"type\":\"EMAIL\",\"recipient\":\"user@example.com\",\"status\":\"PENDING\"}"
+                                    ),
+                                    @ExampleObject(
+                                            name = "sms",
+                                            summary = "SMS notification queued",
+                                            value = "{\"id\":2,\"type\":\"SMS\",\"recipient\":\"+351912345678\",\"status\":\"PENDING\"}"
+                                    )
+                            }
+                    )
+            ),
             @ApiResponse(responseCode = "400", description = "Invalid request payload"),
             @ApiResponse(responseCode = "503", description = "No provider available for the requested channel")
     })

@@ -28,6 +28,8 @@ The project exercises a wide range of real-world annotation patterns so that eve
   - [Ignored-Type Override via @Parameter schema](#7-ignored-type-override-via-parameter-schema)
   - [PUT/PATCH with Explicit @ApiResponse](#8-putpatch-with-explicit-apiresponse)
   - [@Schema Annotation Enrichment on Records](#9-schema-annotation-enrichment-on-records-and-pojos)
+  - [@RequestHeader Parameter](#10-requestheader-parameter)
+  - [Named Examples via @ExampleObject](#11-named-examples-via-exampleobject)
 - [Generated OpenAPI Specification](#generated-openapi-specification)
 - [Plugin Configuration Reference](#plugin-configuration-reference)
 - [Building](#building)
@@ -49,10 +51,12 @@ The plugin generates an OpenAPI 3.0 document **at build time**, directly from co
 | Paginated response wrapper | `UserController` |
 | Security scheme (Bearer JWT) | Global |
 | Multiple server environments | pom.xml configuration |
-| Bean Validation constraints (`@NotBlank`, `@Size`, `@Min`, `@Max`, `@DecimalMin`, `@DecimalMax`, `@Pattern`) | `CreateProductRequest` |
+| Bean Validation constraints (`@NotBlank`, `@NotNull`, `@NotEmpty`, `@Size`, `@Min`, `@Max`, `@DecimalMin`, `@DecimalMax`, `@Pattern`, `@Email`, `@PositiveOrZero`) | `CreateProductRequest` |
 | Ignored-type override via `@Parameter(schema = @Schema(type = "string"))` | `UserApi.listUsers` (`Locale` parameter) |
 | PUT/PATCH with explicit `@ApiResponse` annotations | `GenericVertexRestController.update/patch`, `UserApi.updateUser` |
 | `@Schema` enrichment on records — `description`, `example`, `format`, `accessMode`, `allowableValues`, `hidden`, numeric/length constraints | `ProductDto`, `CreateProductRequest` |
+| `@RequestHeader` parameter | `OrderController.createOrder` (`X-Idempotency-Key` header) |
+| Named response examples via `@ExampleObject` — JSON parsed to structured YAML | `NotificationApi.sendNotification` |
 
 ---
 
@@ -266,6 +270,24 @@ T update(...);
 `UserApi.updateUser` declares three responses (200, 400, 404).
 
 **Verification:** `PUT /api/v1/agents/{id}` and `PATCH /api/v1/agents/{id}` each emit five response entries. `PUT /api/v1/users/{id}` emits three response entries — all with descriptions from the annotations, not the generic "OK" fallback.
+
+### 10. @RequestHeader Parameter
+
+**File:** `controller/OrderController.java` (`createOrder`)
+
+`createOrder` demonstrates an optional `@RequestHeader` parameter — `X-Idempotency-Key` — that the generator maps to an OpenAPI `header` parameter. The annotation is combined with `@Parameter` to supply description and example metadata.
+
+**Verification:** `POST /api/v1/orders` includes an `X-Idempotency-Key` header parameter with `in: header`, `required: false`, and the declared example UUID.
+
+---
+
+### 11. Named Examples via @ExampleObject
+
+**File:** `api/NotificationApi.java` (`sendNotification`)
+
+The `202 Accepted` response on `sendNotification` carries two named `@ExampleObject` entries — one for an email notification and one for SMS. Each value is a JSON string that the generator parses into a `JsonNode` so the YAML output renders as a proper structure instead of a quoted escaped string.
+
+**Verification:** `POST /api/v1/notifications` response `202` contains an `examples` block with `email` and `sms` entries, each emitted as a YAML mapping (not a quoted string).
 
 ---
 

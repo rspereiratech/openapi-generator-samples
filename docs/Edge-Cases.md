@@ -126,3 +126,27 @@ Before the `ResponseProcessorImpl` fix, the response processor only consulted ex
 **Correct behaviour:** `processExplicitApiResponses` must be called for every HTTP method. Its result must take precedence over the default-response fallback for PUT and PATCH exactly as it does for GET and POST.
 
 **Verification:** `PUT /api/v1/agents/{id}` carries responses 200, 400, 401, 403, 404 — each with descriptions from the `@ApiResponse` annotations, not a generic "OK". The same applies to `PATCH /api/v1/agents/{id}` (200, 400, 401, 403, 404) and `PUT /api/v1/users/{id}` (200, 400, 404).
+
+---
+
+## `@RequestHeader` parameter name from annotation value
+
+**Sample:** `OrderController.createOrder` — `X-Idempotency-Key` header
+
+HTTP header names often contain hyphens, which are not valid Java identifiers. The plugin must read the parameter name from `@RequestHeader.value()` (or `@RequestHeader.name()`), not from the Java parameter name.
+
+**Problematic behaviour (naive implementation):** Using the Java parameter name `idempotencyKey` as the header name instead of reading `@RequestHeader(value = "X-Idempotency-Key")`.
+
+**Correct behaviour:** `ParameterProcessorImpl` must read the `value` attribute of `@RequestHeader` (falling back to the Java parameter name only when the attribute is blank) and emit the parameter with `in: header` and the correct header name.
+
+**Verification:** `POST /api/v1/orders` contains a header parameter named exactly `X-Idempotency-Key`, not `idempotencyKey`.
+
+---
+
+## `@NotEmpty` vs `@NotBlank` on String fields
+
+**Sample:** `CreateProductRequest` — `sku` field annotated with `@NotEmpty`
+
+`@NotEmpty` and `@NotBlank` both set `nullable: false` on the schema property, but they differ: `@NotEmpty` additionally sets `minLength: 1` (the string must be non-empty), while `@NotBlank` also sets `minLength: 1` but rejects strings that are all whitespace (a runtime concern not reflected in the schema beyond `minLength: 1`).
+
+**Verification:** The `sku` property in `components/schemas/CreateProductRequest` has both `nullable: false` and `minLength: 1`.

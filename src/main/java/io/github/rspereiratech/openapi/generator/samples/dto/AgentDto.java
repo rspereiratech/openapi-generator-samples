@@ -28,9 +28,9 @@ public record AgentDto(
                 requiredMode = Schema.RequiredMode.REQUIRED)
         String name,
 
-        @Schema(description = "SSO identifier", example = "alice.smith@8x8.com")
+        @Schema(description = "SSO identifier", example = "alice.smith@example.com")
         String ssoId,
 
-        @Schema(description = "LDAP identifier", example = "cn=alice,ou=agents,dc=8x8,dc=com")
+        @Schema(description = "LDAP identifier", example = "cn=alice,ou=agents,dc=example,dc=com")
         String ldapId
 ) {}

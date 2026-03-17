@@ -13,11 +13,14 @@ package io.github.rspereiratech.openapi.generator.samples.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
 
 import java.math.BigDecimal;
@@ -32,11 +35,13 @@ import java.math.BigDecimal;
  *
  * <p>Constraint → OpenAPI schema mapping:
  * <ul>
- *   <li>{@link NotBlank} / {@link NotNull} → {@code nullable: false}</li>
+ *   <li>{@link NotBlank} / {@link NotNull} / {@link NotEmpty} → {@code nullable: false}</li>
  *   <li>{@link Size} → {@code minLength} / {@code maxLength}</li>
  *   <li>{@link DecimalMin} / {@link DecimalMax} → {@code minimum} / {@code maximum}</li>
  *   <li>{@link Min} / {@link Max} → {@code minimum} / {@code maximum}</li>
+ *   <li>{@link PositiveOrZero} → {@code minimum: 0}</li>
  *   <li>{@link Pattern} → {@code pattern}</li>
+ *   <li>{@link Email} → {@code format: email}</li>
  * </ul>
  *
  * @author ruispereira
@@ -71,6 +76,20 @@ public record CreateProductRequest(
         @Min(0)
         @Max(9999)
         @Schema(description = "Initial stock quantity", example = "100")
-        int stock
+        int stock,
+
+        @NotEmpty
+        @Size(max = 50)
+        @Schema(description = "Stock-keeping unit code", example = "WKB-001",
+                requiredMode = Schema.RequiredMode.REQUIRED)
+        String sku,
+
+        @Email
+        @Schema(description = "Supplier contact email", example = "supplier@example.com")
+        String supplierEmail,
+
+        @PositiveOrZero
+        @Schema(description = "Weight in grams", example = "350")
+        Integer weight
 
 ) {}

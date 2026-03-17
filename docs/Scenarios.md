@@ -177,7 +177,7 @@ Walk both the superclass chain and the interface list, collect all six operation
 
 ### What it does
 
-`CreateProductRequest` applies every supported Jakarta validation constraint across its five fields so that each constraint type has a concrete, verifiable representation in the generated schema:
+`CreateProductRequest` applies every supported Jakarta validation constraint so that each constraint type has a concrete, verifiable representation in the generated schema:
 
 ```java
 @NotBlank
@@ -198,7 +198,17 @@ String category,
 
 @Min(0)
 @Max(9999)
-int stock
+int stock,
+
+@NotEmpty
+@Size(max = 50)
+String sku,
+
+@Email
+String supplierEmail,
+
+@PositiveOrZero
+Integer weight
 ```
 
 ### What the plugin must do
@@ -217,6 +227,10 @@ After Swagger's `ModelConverters` generates the base schema for `CreateProductRe
 | `@Pattern(regexp="^[A-Z_]+$")` | `category` | `pattern: ^[A-Z_]+$` |
 | `@Min(0)` | `stock` | `minimum: 0` |
 | `@Max(9999)` | `stock` | `maximum: 9999` |
+| `@NotEmpty` | `sku` | `nullable: false`, `minLength: 1` |
+| `@Size(max=50)` | `sku` | `maxLength: 50` |
+| `@Email` | `supplierEmail` | `format: email` |
+| `@PositiveOrZero` | `weight` | `minimum: 0` |
 
 ### Expected output
 
@@ -226,6 +240,9 @@ After Swagger's `ModelConverters` generates the base schema for `CreateProductRe
 - `price`: `nullable: false`, `minimum: 0.01`, `maximum: 99999.99`
 - `category`: `nullable: false`, `pattern: ^[A-Z_]+$`
 - `stock`: `minimum: 0`, `maximum: 9999`
+- `sku`: `nullable: false`, `minLength: 1`, `maxLength: 50`
+- `supplierEmail`: `format: email`
+- `weight`: `minimum: 0`
 
 ---
 
@@ -387,4 +404,106 @@ ProductDto:
       nullable: false    # from @NotNull
       minimum: 0.01      # from @DecimalMin
       maximum: 99999.99  # from @DecimalMax
+```
+
+---
+
+## 10. `@RequestHeader` Parameter
+
+**Controller:** `OrderController` (`createOrder`)
+**Plugin capability tested:** Mapping `@RequestHeader` to an OpenAPI `header` parameter
+
+### What it does
+
+`OrderController.createOrder` receives an optional `X-Idempotency-Key` HTTP request header:
+
+```java
+@PostMapping
+public OrderDto createOrder(
+        @RequestBody OrderDto order,
+        @Parameter(description = "Optional client-generated idempotency key ...",
+                   example = "550e8400-e29b-41d4-a716-446655440000")
+        @RequestHeader(value = "X-Idempotency-Key", required = false) String idempotencyKey)
+```
+
+### What the plugin must do
+
+Recognise `@RequestHeader` and emit the parameter with `in: header`, using the parameter name from the annotation's `value` attribute, and `required: false` because the annotation sets `required = false`.
+
+### Expected output
+
+`POST /api/v1/orders` includes:
+```yaml
+- name: X-Idempotency-Key
+  in: header
+  required: false
+  schema:
+    type: string
+  example: 550e8400-e29b-41d4-a716-446655440000
+```
+
+---
+
+## 11. Named Examples via `@ExampleObject`
+
+**Interface:** `api/NotificationApi.java` (`sendNotification`)
+**Plugin capability tested:** `@Content(examples = { @ExampleObject(...) })` — named response examples with JSON-parsed `value`
+
+### What it does
+
+The `202 Accepted` response on `sendNotification` carries two named examples:
+
+```java
+@ApiResponse(
+    responseCode = "202",
+    content = @Content(
+        mediaType = "application/json",
+        schema = @Schema(implementation = NotificationDto.class),
+        examples = {
+            @ExampleObject(
+                name = "email",
+                summary = "Email notification queued",
+                value = "{\"id\":1,\"type\":\"EMAIL\",\"recipient\":\"user@example.com\",\"status\":\"PENDING\"}"
+            ),
+            @ExampleObject(
+                name = "sms",
+                summary = "SMS notification queued",
+                value = "{\"id\":2,\"type\":\"SMS\",\"recipient\":\"+351912345678\",\"status\":\"PENDING\"}"
+            )
+        }
+    )
+)
+```
+
+### What the plugin must do
+
+1. Resolve each `@ExampleObject` by `name` into the response `examples` map.
+2. Parse `value` as JSON and store it as a `JsonNode` so the YAML serialiser emits a proper mapping instead of a quoted escaped string.
+3. Apply `summary` when non-blank.
+
+### Expected output
+
+`POST /api/v1/notifications` response `202`:
+```yaml
+'202':
+  description: Notification accepted for delivery
+  content:
+    application/json:
+      schema:
+        $ref: '#/components/schemas/NotificationDto'
+      examples:
+        email:
+          summary: Email notification queued
+          value:
+            id: 1
+            type: EMAIL
+            recipient: user@example.com
+            status: PENDING
+        sms:
+          summary: SMS notification queued
+          value:
+            id: 2
+            type: SMS
+            recipient: "+351912345678"
+            status: PENDING
 ```
