@@ -1,7 +1,7 @@
 # openapi-generator-samples
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Java 21](https://img.shields.io/badge/Java-21-blue?logo=openjdk)](https://openjdk.org/projects/jdk/21/)
+[![Java 17](https://img.shields.io/badge/Java-17+-blue?logo=openjdk)](https://openjdk.org/projects/jdk/17/)
 [![Spring](https://img.shields.io/badge/Spring-6DB33F?logo=spring&logoColor=white)](https://spring.io)
 [![OpenAPI 3.0](https://img.shields.io/badge/OpenAPI-3.0-green?logo=openapiinitiative)](docs/swagger/openapi.yaml)
 ![REST API](https://img.shields.io/badge/REST-API-blue)
@@ -64,7 +64,7 @@ The plugin generates an OpenAPI 3.0 document **at build time**, directly from co
 
 | Tool | Version |
 |---|---|
-| Java | 21+ |
+| Java | 17+ |
 | Maven | 3.9+ |
 | `openapi-generator-parent` | latest (must be installed locally) |
 

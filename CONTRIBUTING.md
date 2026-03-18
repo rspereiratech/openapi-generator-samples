@@ -19,7 +19,7 @@ This module is the reference sample suite for the [`openapi-generator-maven-plug
 
 ## Prerequisites
 
-- Java 21+
+- Java 17+
 - Maven 3.9+
 - `openapi-generator-parent` installed locally (see [README](README.md#prerequisites))
 

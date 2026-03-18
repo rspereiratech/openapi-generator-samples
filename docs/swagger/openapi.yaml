@@ -8,7 +8,7 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0
-  version: 1.1.0-SNAPSHOT
+  version: 1.2.0
 servers:
 - url: https://api.example.com/sample-api/
   description: Production
@@ -881,28 +881,6 @@ components:
           description: Display name of the agent group
           example: Tier-1 Support
       description: Agent group data transfer object
-    NotificationProviderDto:
-      required:
-      - name
-      type: object
-      properties:
-        name:
-          type: string
-          description: Provider name
-          example: sendgrid
-        type:
-          type: string
-          description: Channel type handled by this provider
-          example: EMAIL
-          enum:
-          - EMAIL
-          - SMS
-          - PUSH
-        available:
-          type: boolean
-          description: Whether the provider is currently reachable
-          example: true
-      description: Notification provider descriptor
     NotificationDto:
       required:
       - recipient
@@ -990,6 +968,28 @@ components:
           - NORMAL
           - HIGH
       description: Payload for dispatching a notification
+    NotificationProviderDto:
+      required:
+      - name
+      type: object
+      properties:
+        name:
+          type: string
+          description: Provider name
+          example: sendgrid
+        type:
+          type: string
+          description: Channel type handled by this provider
+          example: EMAIL
+          enum:
+          - EMAIL
+          - SMS
+          - PUSH
+        available:
+          type: boolean
+          description: Whether the provider is currently reachable
+          example: true
+      description: Notification provider descriptor
     OrderDto:
       required:
       - customerId
@@ -1197,39 +1197,6 @@ components:
           format: int32
           example: 350
       description: Payload for creating a new product
-    PagedResponseUserDto:
-      type: object
-      properties:
-        content:
-          type: array
-          description: Items in the current page
-          items:
-            $ref: '#/components/schemas/UserDto'
-        page:
-          type: integer
-          description: Current page number (0-based)
-          format: int32
-          example: 0
-        size:
-          type: integer
-          description: Number of items per page
-          format: int32
-          example: 20
-        totalElements:
-          type: integer
-          description: Total number of items across all pages
-          format: int64
-          example: 150
-        totalPages:
-          type: integer
-          description: Total number of pages
-          format: int32
-          example: 8
-        last:
-          type: boolean
-          description: Whether this is the last page
-          example: false
-      description: Paginated response wrapper
     UserDto:
       required:
       - email
@@ -1273,6 +1240,39 @@ components:
           format: date-time
           readOnly: true
       description: User data transfer object
+    PagedResponseUserDto:
+      type: object
+      properties:
+        content:
+          type: array
+          description: Items in the current page
+          items:
+            $ref: '#/components/schemas/UserDto'
+        page:
+          type: integer
+          description: Current page number (0-based)
+          format: int32
+          example: 0
+        size:
+          type: integer
+          description: Number of items per page
+          format: int32
+          example: 20
+        totalElements:
+          type: integer
+          description: Total number of items across all pages
+          format: int64
+          example: 150
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int32
+          example: 8
+        last:
+          type: boolean
+          description: Whether this is the last page
+          example: false
+      description: Paginated response wrapper
     CreateUserRequest:
       required:
       - email
