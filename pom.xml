@@ -19,10 +19,6 @@
         The openapi.yaml is generated from compiled classes during the process-classes phase.
     </description>
 
-    <properties>
-        <maven.deploy.skip>true</maven.deploy.skip>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.springframework</groupId>

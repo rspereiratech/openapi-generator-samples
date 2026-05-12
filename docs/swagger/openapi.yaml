@@ -871,44 +871,99 @@ components:
           description: Display name of the agent group
           example: Tier-1 Support
       description: Agent group data transfer object
-    SendNotificationRequest:
+    CreateProductRequest:
       required:
-      - body
-      - recipient
-      - subject
-      - type
+      - category
+      - name
+      - price
+      - sku
       type: object
       properties:
-        type:
+        name:
+          maxLength: 100
+          minLength: 2
           type: string
-          description: Delivery channel
-          example: EMAIL
+          description: Product name
+          nullable: false
+          example: Wireless Keyboard
+        description:
+          maxLength: 500
+          type: string
+          description: Detailed description
+          example: Compact bluetooth keyboard
+        price:
+          maximum: 99999.99
+          minimum: 0.01
+          type: number
+          description: Unit price in EUR
+          nullable: false
+          example: 49.99
+        category:
+          pattern: "^[A-Z_]+$"
+          type: string
+          description: Product category code
+          nullable: false
+          example: ELECTRONICS
           enum:
-          - EMAIL
-          - SMS
-          - PUSH
-        recipient:
+          - ELECTRONICS
+          - CLOTHING
+          - FOOD
+          - BOOKS
+        stock:
+          maximum: 9999
+          minimum: 0
+          type: integer
+          description: Initial stock quantity
+          format: int32
+          example: 100
+        sku:
+          maxLength: 50
+          minLength: 1
           type: string
-          description: "Recipient address (email, phone number, or device token)"
-          example: user@example.com
-        subject:
+          description: Stock-keeping unit code
+          nullable: false
+          example: WKB-001
+        supplierEmail:
           type: string
-          description: Message subject or title
-          example: Your order has shipped
-        body:
+          description: Supplier contact email
+          format: email
+          example: supplier@example.com
+        weight:
+          minimum: 0
+          type: integer
+          description: Weight in grams
+          format: int32
+          example: 350
+      description: Payload for creating a new product
+    CreateUserRequest:
+      required:
+      - email
+      - name
+      - password
+      type: object
+      properties:
+        name:
           type: string
-          description: Full message body
-          example: "Your order #42 is on its way!"
-        priority:
+          description: Full name of the user
+          example: João Costa
+        email:
           type: string
-          description: Delivery priority
-          example: NORMAL
-          default: NORMAL
+          description: Unique email address
+          example: joao@example.com
+        password:
+          type: string
+          description: Plain-text password (will be hashed server-side)
+          example: s3cr3t!
+        role:
+          type: string
+          description: Role to assign to the user
+          example: USER
+          default: USER
           enum:
-          - LOW
-          - NORMAL
-          - HIGH
-      description: Payload for dispatching a notification
+          - USER
+          - ADMIN
+          - MANAGER
+      description: Payload for creating or updating a user
     NotificationDto:
       required:
       - recipient
@@ -1017,6 +1072,93 @@ components:
           format: date-time
           readOnly: true
       description: Order data transfer object
+    PageProductDto:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/ProductDto'
+        number:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        last:
+          type: boolean
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        numberOfElements:
+          type: integer
+          format: int32
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          type: array
+          items:
+            $ref: '#/components/schemas/SortObject'
+        paged:
+          type: boolean
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        unpaged:
+          type: boolean
+    PagedResponseUserDto:
+      type: object
+      properties:
+        content:
+          type: array
+          description: Items in the current page
+          items:
+            $ref: '#/components/schemas/UserDto'
+        page:
+          type: integer
+          description: Current page number (0-based)
+          format: int32
+          example: 0
+        size:
+          type: integer
+          description: Number of items per page
+          format: int32
+          example: 20
+        totalElements:
+          type: integer
+          description: Total number of items across all pages
+          format: int64
+          example: 150
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int32
+          example: 8
+        last:
+          type: boolean
+          description: Whether this is the last page
+          example: false
+      description: Paginated response wrapper
     ProductDto:
       required:
       - name
@@ -1056,6 +1198,44 @@ components:
           format: int32
           example: 150
       description: Product data transfer object
+    SendNotificationRequest:
+      required:
+      - body
+      - recipient
+      - subject
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: Delivery channel
+          example: EMAIL
+          enum:
+          - EMAIL
+          - SMS
+          - PUSH
+        recipient:
+          type: string
+          description: "Recipient address (email, phone number, or device token)"
+          example: user@example.com
+        subject:
+          type: string
+          description: Message subject or title
+          example: Your order has shipped
+        body:
+          type: string
+          description: Full message body
+          example: "Your order #42 is on its way!"
+        priority:
+          type: string
+          description: Delivery priority
+          example: NORMAL
+          default: NORMAL
+          enum:
+          - LOW
+          - NORMAL
+          - HIGH
+      description: Payload for dispatching a notification
     SortObject:
       type: object
       properties:
@@ -1069,157 +1249,6 @@ components:
           type: string
         ignoreCase:
           type: boolean
-    PageableObject:
-      type: object
-      properties:
-        offset:
-          type: integer
-          format: int64
-        sort:
-          type: array
-          items:
-            $ref: '#/components/schemas/SortObject'
-        paged:
-          type: boolean
-        pageNumber:
-          type: integer
-          format: int32
-        pageSize:
-          type: integer
-          format: int32
-        unpaged:
-          type: boolean
-    PageProductDto:
-      type: object
-      properties:
-        totalElements:
-          type: integer
-          format: int64
-        totalPages:
-          type: integer
-          format: int32
-        size:
-          type: integer
-          format: int32
-        content:
-          type: array
-          items:
-            $ref: '#/components/schemas/ProductDto'
-        number:
-          type: integer
-          format: int32
-        first:
-          type: boolean
-        last:
-          type: boolean
-        sort:
-          type: array
-          items:
-            $ref: '#/components/schemas/SortObject'
-        numberOfElements:
-          type: integer
-          format: int32
-        pageable:
-          $ref: '#/components/schemas/PageableObject'
-        empty:
-          type: boolean
-    CreateProductRequest:
-      required:
-      - category
-      - name
-      - price
-      - sku
-      type: object
-      properties:
-        name:
-          maxLength: 100
-          minLength: 2
-          type: string
-          description: Product name
-          nullable: false
-          example: Wireless Keyboard
-        description:
-          maxLength: 500
-          type: string
-          description: Detailed description
-          example: Compact bluetooth keyboard
-        price:
-          maximum: 99999.99
-          minimum: 0.01
-          type: number
-          description: Unit price in EUR
-          nullable: false
-          example: 49.99
-        category:
-          pattern: "^[A-Z_]+$"
-          type: string
-          description: Product category code
-          nullable: false
-          example: ELECTRONICS
-          enum:
-          - ELECTRONICS
-          - CLOTHING
-          - FOOD
-          - BOOKS
-        stock:
-          maximum: 9999
-          minimum: 0
-          type: integer
-          description: Initial stock quantity
-          format: int32
-          example: 100
-        sku:
-          maxLength: 50
-          minLength: 1
-          type: string
-          description: Stock-keeping unit code
-          nullable: false
-          example: WKB-001
-        supplierEmail:
-          type: string
-          description: Supplier contact email
-          format: email
-          example: supplier@example.com
-        weight:
-          minimum: 0
-          type: integer
-          description: Weight in grams
-          format: int32
-          example: 350
-      description: Payload for creating a new product
-    PagedResponseUserDto:
-      type: object
-      properties:
-        content:
-          type: array
-          description: Items in the current page
-          items:
-            $ref: '#/components/schemas/UserDto'
-        page:
-          type: integer
-          description: Current page number (0-based)
-          format: int32
-          example: 0
-        size:
-          type: integer
-          description: Number of items per page
-          format: int32
-          example: 20
-        totalElements:
-          type: integer
-          description: Total number of items across all pages
-          format: int64
-          example: 150
-        totalPages:
-          type: integer
-          description: Total number of pages
-          format: int32
-          example: 8
-        last:
-          type: boolean
-          description: Whether this is the last page
-          example: false
-      description: Paginated response wrapper
     UserDto:
       required:
       - email
@@ -1263,35 +1292,6 @@ components:
           format: date-time
           readOnly: true
       description: User data transfer object
-    CreateUserRequest:
-      required:
-      - email
-      - name
-      - password
-      type: object
-      properties:
-        name:
-          type: string
-          description: Full name of the user
-          example: João Costa
-        email:
-          type: string
-          description: Unique email address
-          example: joao@example.com
-        password:
-          type: string
-          description: Plain-text password (will be hashed server-side)
-          example: s3cr3t!
-        role:
-          type: string
-          description: Role to assign to the user
-          example: USER
-          default: USER
-          enum:
-          - USER
-          - ADMIN
-          - MANAGER
-      description: Payload for creating or updating a user
   securitySchemes:
     bearerAuth:
       type: http
