@@ -7,7 +7,7 @@
     <parent>
         <groupId>io.github.rspereiratech</groupId>
         <artifactId>openapi-generator-parent</artifactId>
-        <version>1.3.0-SNAPSHOT</version>
+        <version>1.3.0</version>
     </parent>
 
     <artifactId>openapi-generator-samples</artifactId>
@@ -43,7 +43,7 @@
             <plugin>
                 <groupId>io.github.rspereiratech</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>1.3.0-SNAPSHOT</version>
+                <version>1.3.0</version>
                 <executions>
                     <execution>
                         <id>generate-openapi</id>
@@ -60,7 +60,7 @@
                     <contextPath>sample-api</contextPath>
                     <title>Sample API</title>
                     <description>Demo REST API generated offline from Spring MVC annotations</description>
-                    <version>1.3.0-SNAPSHOT</version>
+                    <version>1.3.0</version>
                     <servers>
                         <server>
                             <url>https://api.example.com</url>
