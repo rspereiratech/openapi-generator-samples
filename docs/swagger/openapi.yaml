@@ -8,7 +8,7 @@ info:
   license:
     name: Apache 2.0
     url: https://www.apache.org/licenses/LICENSE-2.0
-  version: 1.2.0
+  version: 1.3.0-SNAPSHOT
 servers:
 - url: https://api.example.com/sample-api/
   description: Production
@@ -19,8 +19,6 @@ servers:
 security:
 - bearerAuth: []
 tags:
-- name: Generic REST API
-  description: Generic CRUD operations for domain entities
 - name: Agents
   description: Agent management operations
 - name: notifications
@@ -35,7 +33,6 @@ paths:
   /api/v1/agents:
     get:
       tags:
-      - Generic REST API
       - Agents
       summary: Get all entities
       description: "Returns a paginated list of entities, with optional filtering\
@@ -75,7 +72,6 @@ paths:
           description: Internal server error
     post:
       tags:
-      - Generic REST API
       - Agents
       summary: Create new entity
       description: Creates a new instance of the entity
@@ -103,7 +99,6 @@ paths:
   /api/v1/agents/{id}:
     get:
       tags:
-      - Generic REST API
       - Agents
       summary: Get entity by ID
       description: Returns the entity with the given ID
@@ -130,7 +125,6 @@ paths:
           description: Entity not found
     put:
       tags:
-      - Generic REST API
       - Agents
       summary: Update existing entity
       description: Replaces the data of the entity with the given ID
@@ -166,7 +160,6 @@ paths:
           description: Entity not found
     delete:
       tags:
-      - Generic REST API
       - Agents
       summary: Delete entity by ID
       description: Deletes the entity with the specified ID
@@ -189,7 +182,6 @@ paths:
           description: Entity not found
     patch:
       tags:
-      - Generic REST API
       - Agents
       summary: Partially update an existing entity
       description: Applies partial modifications to the entity identified by the given
@@ -227,7 +219,6 @@ paths:
   /api/v1/agents/{id}/exists:
     get:
       tags:
-      - Generic REST API
       - Agents
       summary: Check if entity exists
       description: Verifies whether an entity with the given ID exists
@@ -255,7 +246,6 @@ paths:
   /api/v1/agents/{id}/group:
     get:
       tags:
-      - Generic REST API
       - Agents
       summary: Get Agent Group by Agent ID
       description: Returns the agent group associated with the given agent ID
@@ -881,6 +871,44 @@ components:
           description: Display name of the agent group
           example: Tier-1 Support
       description: Agent group data transfer object
+    SendNotificationRequest:
+      required:
+      - body
+      - recipient
+      - subject
+      - type
+      type: object
+      properties:
+        type:
+          type: string
+          description: Delivery channel
+          example: EMAIL
+          enum:
+          - EMAIL
+          - SMS
+          - PUSH
+        recipient:
+          type: string
+          description: "Recipient address (email, phone number, or device token)"
+          example: user@example.com
+        subject:
+          type: string
+          description: Message subject or title
+          example: Your order has shipped
+        body:
+          type: string
+          description: Full message body
+          example: "Your order #42 is on its way!"
+        priority:
+          type: string
+          description: Delivery priority
+          example: NORMAL
+          default: NORMAL
+          enum:
+          - LOW
+          - NORMAL
+          - HIGH
+      description: Payload for dispatching a notification
     NotificationDto:
       required:
       - recipient
@@ -930,44 +958,6 @@ components:
           format: date-time
           readOnly: true
       description: Notification data transfer object
-    SendNotificationRequest:
-      required:
-      - body
-      - recipient
-      - subject
-      - type
-      type: object
-      properties:
-        type:
-          type: string
-          description: Delivery channel
-          example: EMAIL
-          enum:
-          - EMAIL
-          - SMS
-          - PUSH
-        recipient:
-          type: string
-          description: "Recipient address (email, phone number, or device token)"
-          example: user@example.com
-        subject:
-          type: string
-          description: Message subject or title
-          example: Your order has shipped
-        body:
-          type: string
-          description: Full message body
-          example: "Your order #42 is on its way!"
-        priority:
-          type: string
-          description: Delivery priority
-          example: NORMAL
-          default: NORMAL
-          enum:
-          - LOW
-          - NORMAL
-          - HIGH
-      description: Payload for dispatching a notification
     NotificationProviderDto:
       required:
       - name
@@ -1197,6 +1187,39 @@ components:
           format: int32
           example: 350
       description: Payload for creating a new product
+    PagedResponseUserDto:
+      type: object
+      properties:
+        content:
+          type: array
+          description: Items in the current page
+          items:
+            $ref: '#/components/schemas/UserDto'
+        page:
+          type: integer
+          description: Current page number (0-based)
+          format: int32
+          example: 0
+        size:
+          type: integer
+          description: Number of items per page
+          format: int32
+          example: 20
+        totalElements:
+          type: integer
+          description: Total number of items across all pages
+          format: int64
+          example: 150
+        totalPages:
+          type: integer
+          description: Total number of pages
+          format: int32
+          example: 8
+        last:
+          type: boolean
+          description: Whether this is the last page
+          example: false
+      description: Paginated response wrapper
     UserDto:
       required:
       - email
@@ -1240,39 +1263,6 @@ components:
           format: date-time
           readOnly: true
       description: User data transfer object
-    PagedResponseUserDto:
-      type: object
-      properties:
-        content:
-          type: array
-          description: Items in the current page
-          items:
-            $ref: '#/components/schemas/UserDto'
-        page:
-          type: integer
-          description: Current page number (0-based)
-          format: int32
-          example: 0
-        size:
-          type: integer
-          description: Number of items per page
-          format: int32
-          example: 20
-        totalElements:
-          type: integer
-          description: Total number of items across all pages
-          format: int64
-          example: 150
-        totalPages:
-          type: integer
-          description: Total number of pages
-          format: int32
-          example: 8
-        last:
-          type: boolean
-          description: Whether this is the last page
-          example: false
-      description: Paginated response wrapper
     CreateUserRequest:
       required:
       - email

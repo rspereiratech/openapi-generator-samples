@@ -1,10 +1,13 @@
 # openapi-generator-samples
 
+[![Build](https://img.shields.io/github/actions/workflow/status/rspereiratech/openapi-generator-samples/build.yml?branch=master&label=Build)](https://github.com/rspereiratech/openapi-generator-samples/actions/workflows/build.yml)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/rspereiratech/openapi-generator-samples/codeql.yml?branch=master&label=CodeQL)](https://github.com/rspereiratech/openapi-generator-samples/security/code-scanning)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Java 17](https://img.shields.io/badge/Java-17+-blue?logo=openjdk)](https://openjdk.org/projects/jdk/17/)
 [![Spring](https://img.shields.io/badge/Spring-6DB33F?logo=spring&logoColor=white)](https://spring.io)
 [![OpenAPI 3.0](https://img.shields.io/badge/OpenAPI-3.0-green?logo=openapiinitiative)](docs/swagger/openapi.yaml)
 ![REST API](https://img.shields.io/badge/REST-API-blue)
+[![Donate](https://img.shields.io/badge/Donate-Crypto-2ECC71?logo=bitcoin&logoColor=white)](https://nowpayments.io/donation/rspereiratech)
 
 Sample Spring MVC application used to validate and demonstrate the capabilities of the [`openapi-generator-maven-plugin`](https://github.com/rspereiratech/openapi-generator-maven-plugin).
 
@@ -343,6 +346,16 @@ mvn process-classes
 ```
 
 The generated file will be written to `docs/swagger/openapi.yaml`.
+
+---
+
+## Support
+
+If you find this project useful, consider supporting its development:
+
+[![Donate](https://img.shields.io/badge/Donate-Crypto-2ECC71?logo=bitcoin&logoColor=white)](https://nowpayments.io/donation/rspereiratech)
+
+Crypto donations via [NOWPayments](https://nowpayments.io/donation/rspereiratech) — supports BTC, ETH, USDT and many others.
 
 ---
 
