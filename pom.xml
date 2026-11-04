@@ -7,7 +7,7 @@
     <parent>
         <groupId>io.github.rspereiratech</groupId>
         <artifactId>openapi-generator-parent</artifactId>
-        <version>1.3.3-SNAPSHOT</version>
+        <version>1.3.3</version>
     </parent>
 
     <artifactId>openapi-generator-samples</artifactId>
@@ -18,6 +18,11 @@
         Sample Spring MVC application used to validate the openapi-generator-maven-plugin.
         The openapi.yaml is generated from compiled classes during the process-classes phase.
     </description>
+
+    <properties>
+        <!-- Samples are for learning the plugin, not a published artifact: never deploy them. -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -43,7 +48,7 @@
             <plugin>
                 <groupId>io.github.rspereiratech</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>1.3.3-SNAPSHOT</version>
+                <version>1.3.3</version>
                 <executions>
                     <execution>
                         <id>generate-openapi</id>
